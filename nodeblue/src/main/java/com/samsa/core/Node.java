@@ -23,15 +23,11 @@ public abstract class Node {
      * @param message 처리할 메시지 객체
      */
     public abstract void onMessage(Message message);
-<<<<<<< HEAD
 
-    // 공통 구현 메소드들
-=======
     
     /**
      * 노드를 시작하고 상태를 RUNNING으로 변경합니다.
      */
->>>>>>> upstream/main
     public void start() {
         status = NodeStatus.RUNNING;
         log.info("Node[{}] started", id);
@@ -56,12 +52,8 @@ public abstract class Node {
         log.error("Error in Node[{}]: ", id, error);
     }
 
-<<<<<<< HEAD
-    public UUID getId() {
-=======
-    
+
     public String getId() {
->>>>>>> upstream/main
         return id;
     }
 
