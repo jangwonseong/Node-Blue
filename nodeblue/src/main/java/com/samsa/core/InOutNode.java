@@ -14,14 +14,19 @@ public abstract class InOutNode extends Node {
     private final List<Pipe> inputPipes = new ArrayList<>();
     /** 출력 파이프들의 리스트 */
     private final List<Pipe> outputPipes = new ArrayList<>();
+    
 
-    /**
-     * InOutNode를 생성합니다.
-     *
-     * @param id 노드의 고유 식별자
-     */
-    protected InOutNode(String id) {
-        this.id = id;
+    public InOutNode() {
+        super();
+    }
+    
+
+    public InOutNode(UUID id) {
+        super(id);
+    }
+    
+    public InOutNode(String uuid) {
+        super(uuid);
     }
 
     /**
