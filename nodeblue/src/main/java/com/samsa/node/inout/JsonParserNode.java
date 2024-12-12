@@ -14,6 +14,16 @@ public class JsonParserNode extends InOutNode {
 
     @Override
     public void onMessage(Message message) {
-        if(message.getPayload() instanceof )
+        if(message.getPayload().){
+            
+        }
+    }
+
+    private jsonToPipeline(){
+
+    }
+
+    private PipelineToJson(){
+
     }
 }
