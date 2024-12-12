@@ -3,11 +3,12 @@ package com.samsa.core;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.UUID;
 
 public abstract class OutNode extends Node {
     private final List<Pipe> outputPipes = new ArrayList<>();
 
-    protected OutNode(String id) {
+    protected OutNode(UUID id) {
         this.id = id;
     }
 

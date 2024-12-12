@@ -1,5 +1,6 @@
 package com.samsa.core;
 
+import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 
 // 노드 상태 열거형
@@ -11,15 +12,16 @@ enum NodeStatus {
 
 }
 
+
 @Slf4j
 public abstract class Node {
 
-    protected String id;
+    protected UUID id;
     protected NodeStatus status = NodeStatus.CREATED;
 
     // 필수 구현 메소드
     public abstract void onMessage(Message message);
-    
+
     // 공통 구현 메소드들
     public void start() {
         status = NodeStatus.RUNNING;
@@ -36,11 +38,11 @@ public abstract class Node {
         log.error("Error in Node[{}]: ", id, error);
     }
 
-    public String getId() {
+    public UUID getId() {
         return id;
     }
 
-    public void setId(String id) {
+    public void setId(UUID id) {
         this.id = id;
     }
 }
