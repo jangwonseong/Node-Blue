@@ -65,6 +65,4 @@ public abstract class InOutNode extends Node {
     protected List<Pipe> getOutputPipes() {
         return Collections.unmodifiableList(outputPipes);
     }
-
-
 }

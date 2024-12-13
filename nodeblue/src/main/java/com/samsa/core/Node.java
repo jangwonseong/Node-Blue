@@ -4,6 +4,7 @@ import java.util.UUID;
 
 import lombok.extern.slf4j.Slf4j;
 
+
 /**
  * 모든 노드의 기본 추상 클래스입니다.
  * 노드의 생명주기와 기본적인 에러 처리를 관리합니다.
@@ -42,6 +43,7 @@ public abstract class Node {
      * @param message 처리할 메시지 객체
      */
     public abstract void onMessage(Message message);
+
     
     /**
      * 노드를 시작하고 상태를 RUNNING으로 변경합니다.
