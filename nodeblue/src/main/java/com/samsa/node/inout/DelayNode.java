@@ -14,7 +14,10 @@ public class DelayNode extends InOutNode {
 
     private long delayTime; // 메시지를 지연시킬 시간 (밀리초 단위)
     private final Queue<Message> queue; // 메시지를 보관하는 큐
+
     private final Timer timer; // 비동기 작업을 수행하기 위한 타이머
+
+
 
     /**
      * DelayNode 생성자입니다.
@@ -108,5 +111,10 @@ public class DelayNode extends InOutNode {
      */
     public void setDelayTime(long delayTime) {
         this.delayTime = delayTime;
+    }
+
+    // Getter Queue
+    public Queue<Message> getQueue() {
+        return queue;
     }
 }
