@@ -1,46 +1,66 @@
 package com.samsa.node.inout;
 
+import com.samsa.core.InPort;
+import com.samsa.core.OutPort;
 import com.samsa.core.Message;
 import org.junit.jupiter.api.Test;
 
+import java.util.UUID;
+
 import static org.junit.jupiter.api.Assertions.*;
 
+/**
+ * DelayNode의 기본적인 기능을 테스트하는 클래스입니다.
+ */
 class DelayNodeTest {
-    @Test
-    void testMessageDelay() throws InterruptedException {
-        DelayNode delayNode = new DelayNode("delayNode1", 1000);
-        Message message = new Message("Delayed Message");
 
-        // 메시지를 추가하고 지연 시작
+    /**
+     * 지연 시간이 음수일 때 예외가 발생하는지 테스트합니다.
+     */
+    @Test
+    void 음수_지연시간_테스트() {
+        InPort inPort = new InPort(null);
+        OutPort outPort = new OutPort(null);
+
+        assertThrows(IllegalArgumentException.class, () -> {
+            new DelayNode(UUID.randomUUID(), inPort, outPort, -1000);
+        });
+    }
+
+    /**
+     * 메시지가 실제로 지연되는지 테스트합니다.
+     */
+    @Test
+    void 메시지_지연_테스트() throws InterruptedException {
+        // 테스트를 위한 DelayNode 생성 (500ms 지연)
+        InPort inPort = new InPort(null);
+        OutPort outPort = new OutPort(null);
+        DelayNode delayNode = new DelayNode(UUID.randomUUID(), inPort, outPort, 500);
+
+        // 시작 시간 기록
+        long startTime = System.currentTimeMillis();
+
+        // 메시지 전송
+        Message message = new Message("테스트 메시지");
         delayNode.onMessage(message);
 
-        // 바로 처리되지 않음 확인
-        Thread.sleep(500);
-        assertTrue(delayNode.getQueue().contains(message));
+        // 경과 시간 확인
+        long elapsedTime = System.currentTimeMillis() - startTime;
 
-        // 지연 이후 메시지 처리 확인
-        Thread.sleep(600);
-        assertFalse(delayNode.getQueue().contains(message));
+        // 지연 시간(500ms)보다 경과 시간이 큰지 확인
+        assertTrue(elapsedTime >= 500);
     }
 
+    /**
+     * null 메시지 처리를 테스트합니다.
+     */
     @Test
-    void testFlushMessages() {
-        DelayNode delayNode = new DelayNode("delayNode2", 1000);
-        delayNode.onMessage(new Message("Message 1"));
-        delayNode.onMessage(new Message("Message 2"));
+    void Null_메시지_테스트() {
+        InPort inPort = new InPort(null);
+        OutPort outPort = new OutPort(null);
+        DelayNode delayNode = new DelayNode(UUID.randomUUID(), inPort, outPort, 100);
 
-        // 메시지 강제 플러시
-        delayNode.flush();
-        assertTrue(delayNode.getQueue().isEmpty());
-    }
-
-    @Test
-    void testResetQueue() {
-        DelayNode delayNode = new DelayNode("delayNode3", 1000);
-        delayNode.onMessage(new Message("Message to reset"));
-
-        // 큐 초기화
-        delayNode.reset();
-        assertTrue(delayNode.getQueue().isEmpty());
+        // null 메시지 전송 시 예외가 발생하지 않아야 함
+        assertDoesNotThrow(() -> delayNode.onMessage(null));
     }
 }
