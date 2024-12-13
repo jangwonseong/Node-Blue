@@ -4,6 +4,7 @@ import java.util.UUID;
 
 import lombok.extern.slf4j.Slf4j;
 
+
 /**
  * 모든 노드의 기본 추상 클래스입니다.
  * 노드의 생명주기와 기본적인 에러 처리를 관리합니다.
