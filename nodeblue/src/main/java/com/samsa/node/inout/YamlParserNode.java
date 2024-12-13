@@ -40,14 +40,20 @@ public class YamlParserNode extends InOutNode {
             Object result;
 
             if (message.getPayload() instanceof String yamlString) {
-                // YAML 문자열을 객체로 변환
+                /**
+                 * YAML 문자열을 객체로 변환
+                 */
                 result = parseYamlToObject(yamlString);
             } else {
-                // 객체를 YAML 문자열로 변환
+                /**
+                 * 객체를 YAML 문자열로 변환
+                 */
                 result = convertObjectToYaml(message.getPayload());
             }
 
-            // 성공적으로 변환된 메시지 방출
+            /**
+             * 성공적으로 변환된 메시지 방출
+             */
             emit(new Message(result));
         } catch (JsonProcessingException e) {
             log.error("YAML 처리 중 오류 발생: {}", e.getMessage(), e);

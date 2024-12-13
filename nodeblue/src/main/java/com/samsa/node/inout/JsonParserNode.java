@@ -21,7 +21,7 @@ public class JsonParserNode extends InOutNode {
     /**
      * JsonParserNode 객체를 생성합니다.
      *
-     * @param id          노드의 고유 식별자
+     * @param id 노드의 고유 식별자
      * @param targetClass JSON 문자열을 변환할 대상 클래스
      */
     public JsonParserNode(UUID id, Class<?> targetClass) {
@@ -40,14 +40,20 @@ public class JsonParserNode extends InOutNode {
             Object result;
 
             if (message.getPayload() instanceof String jsonString) {
-                // JSON 문자열을 객체로 변환
+                /**
+                 * JSON 문자열을 객체로 변환
+                 */
                 result = parseJsonToObject(jsonString);
             } else {
-                // 객체를 JSON 문자열로 변환
+                /**
+                 * 객체를 JSON 문자열로 변환
+                 */
                 result = convertObjectToJson(message.getPayload());
             }
 
-            // 성공적으로 변환된 메시지 방출
+            /**
+             * 성공적으로 변환된 메시지 방출
+             */
             emit(new Message(result));
         } catch (JsonProcessingException e) {
             log.error("JSON 처리 중 오류 발생: {}", e.getMessage(), e);
