@@ -47,7 +47,9 @@ public class RangeNode extends InOutNode {
      */
     public RangeNode(UUID id, InPort inPort, OutPort outPort, double inputMin, double inputMax,
             double outputMin, double outputMax, boolean constrainToTarget) {
-        super(id, inPort, outPort);
+        super(id);
+        setInPort(inPort);
+        setOutPort(outPort);
         validateRange(inputMin, inputMax, outputMin, outputMax);
         this.inputMin = inputMin;
         this.inputMax = inputMax;

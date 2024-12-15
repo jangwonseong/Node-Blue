@@ -29,7 +29,9 @@ public class DelayNode extends InOutNode {
      * @throws IllegalArgumentException 지연 시간이 음수이거나 포트가 null인 경우
      */
     public DelayNode(UUID id, InPort inPort, OutPort outPort, long delayMillis) {
-        super(id, inPort, outPort);
+        super(id);
+        setInPort(inPort);
+        setOutPort(outPort);
         if (delayMillis < 0) {
             log.error("지연 시간이 음수입니다: {} ms", delayMillis);
             throw new IllegalArgumentException("Delay time cannot be negative");

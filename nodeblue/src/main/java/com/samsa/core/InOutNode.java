@@ -11,42 +11,53 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Slf4j
 public abstract class InOutNode extends Node {
-    private final InPort inPort;
-    private final OutPort outPort;
+    private InPort inPort;
+    private OutPort outPort;
 
     /**
-     * 지정된 입출력 포트로 InOutNode를 생성합니다.
-     *
-     * @param inPort 입력 포트
-     * @param outPort 출력 포트
-     * @throws IllegalArgumentException 입력 또는 출력 포트가 null인 경우
+     * 기본 생성자로, 랜덤하게 생성된 ID를 사용하여 노드를 초기화합니다.
      */
-    public InOutNode(InPort inPort, OutPort outPort) {
+    public InOutNode() {
         super();
-        if (inPort == null || outPort == null) {
-            log.error("입력 또는 출력 포트가 null입니다");
-            throw new IllegalArgumentException("포트는 null일 수 없습니다");
-        }
-        this.inPort = inPort;
-        this.outPort = outPort;
     }
 
     /**
-     * 지정된 ID와 입출력 포트로 InOutNode를 생성합니다.
+     * 지정된 ID로 노드를 초기화합니다.
      *
      * @param id 노드의 고유 식별자
-     * @param inPort 입력 포트
-     * @param outPort 출력 포트
-     * @throws IllegalArgumentException ID, 입력 또는 출력 포트가 null인 경우
      */
-    public InOutNode(UUID id, InPort inPort, OutPort outPort) {
+    public InOutNode(UUID id) {
         super(id);
-        if (inPort == null || outPort == null) {
-            log.error("입력 또는 출력 포트가 null입니다. NodeId: {}", id);
-            throw new IllegalArgumentException("포트는 null일 수 없습니다");
+    }
+
+    /**
+     * 입력 포트를 설정합니다.
+     *
+     * @param inPort 설정할 입력 포트
+     * @throws IllegalArgumentException 입력 포트가 null인 경우
+     */
+    public void setInPort(InPort inPort) {
+        if (inPort == null) {
+            log.error("입력 포트가 null입니다. NodeId: {}", getId());
+            throw new IllegalArgumentException("입력 포트는 null일 수 없습니다");
         }
         this.inPort = inPort;
+
+    }
+
+    /**
+     * 출력 포트를 설정합니다.
+     *
+     * @param outPort 설정할 출력 포트
+     * @throws IllegalArgumentException 출력 포트가 null인 경우
+     */
+    public void setOutPort(OutPort outPort) {
+        if (outPort == null) {
+            log.error("출력 포트가 null입니다. NodeId: {}", getId());
+            throw new IllegalArgumentException("출력 포트는 null일 수 없습니다");
+        }
         this.outPort = outPort;
+
     }
 
     /**
