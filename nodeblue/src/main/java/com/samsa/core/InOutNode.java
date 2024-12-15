@@ -4,8 +4,7 @@ import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * 입력을 받아서 처리하고 출력을 생성하는 노드의 추상 클래스입니다.
- * 입력과 출력 파이프를 모두 가질 수 있으며, 메시지를 변환하거나 처리할 수 있습니다.
+ * 입력을 받아서 처리하고 출력을 생성하는 노드의 추상 클래스입니다. 입력과 출력 파이프를 모두 가질 수 있으며, 메시지를 변환하거나 처리할 수 있습니다.
  * 
  * @author samsa
  * @since 1.0
@@ -18,7 +17,7 @@ public abstract class InOutNode extends Node {
     /**
      * 지정된 입출력 포트로 InOutNode를 생성합니다.
      *
-     * @param inPort  입력 포트
+     * @param inPort 입력 포트
      * @param outPort 출력 포트
      * @throws IllegalArgumentException 입력 또는 출력 포트가 null인 경우
      */
@@ -35,8 +34,8 @@ public abstract class InOutNode extends Node {
     /**
      * 지정된 ID와 입출력 포트로 InOutNode를 생성합니다.
      *
-     * @param id      노드의 고유 식별자
-     * @param inPort  입력 포트
+     * @param id 노드의 고유 식별자
+     * @param inPort 입력 포트
      * @param outPort 출력 포트
      * @throws IllegalArgumentException ID, 입력 또는 출력 포트가 null인 경우
      */
