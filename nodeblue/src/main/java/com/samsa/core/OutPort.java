@@ -4,6 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
+
+import com.samsa.node.out.MqttInNode;
+
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -61,6 +64,8 @@ public class OutPort {
         pipes.forEach(pipe -> {
             try {
                 pipe.offer(message);
+                log.debug("파이프에서 꺼낸거ㅓㅓㅓㅓㅓㅓㅓㅓㅓㅓㅓㅓㅓㅓㅓㅓㅓㅓ "+pipe.poll().toString());
+                // System.out.println("메시지 입니다!!!!!!!!!!!!!!! " + message);
                 log.debug("파이프로 메시지 전송 완료. PipeId: {}", pipe.getId());
             } catch (Exception e) {
                 log.error("파이프로 메시지 전송 실패. PipeId: {}", pipe.getId(), e);
@@ -129,5 +134,25 @@ public class OutPort {
      */
     public List<Pipe> getPipes() {
         return new ArrayList<>(pipes);
+    }
+    public static void main(String[] args) {
+        MqttInNode mqttInNode;
+        String[] topics = {"application/#", "123"};
+        mqttInNode = new MqttInNode("tcp://192.168.70.203:1883", "1235", topics); // 노드부터 만들었을 때
+        OutPort outPort = new OutPort(mqttInNode);
+        Pipe pipe = new Pipe();
+        outPort.addPipe(pipe);
+        mqttInNode.setOutPort(outPort);
+
+        mqttInNode.start();
+        // log.info(pipe.poll().toString());
+        
+        try {
+            Thread.sleep(1000000);
+        } catch (InterruptedException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        // Assertions.assertDoesNotThrow(() -> mqttInNode.start());
     }
 }

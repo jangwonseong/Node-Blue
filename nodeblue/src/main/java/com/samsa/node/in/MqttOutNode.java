@@ -8,6 +8,8 @@ import org.eclipse.paho.client.mqttv3.MqttMessage;
 
 import com.samsa.core.InNode;
 import com.samsa.core.Message;
+import com.samsa.core.OutNode;
+import com.samsa.core.OutPort;
 
 /**
  * MQTT 출력 노드 클래스. MQTT 브로커에 연결하고 메시지를 발행합니다.
@@ -25,10 +27,10 @@ public class MqttOutNode extends InNode {
      *
      * @param broker MQTT 브로커의 URL
      * @param clientId 연결에 사용할 클라이언트 ID
+     * @param outPort 브로커 포트 번호
      * @throws NullPointerException broker 또는 clientId가 null인 경우
      */
     public MqttOutNode(String broker, String clientId) {
-        super();
         if (Objects.isNull(broker) || Objects.isNull(clientId)) {
             throw new NullPointerException("브로커와 클라이언트 ID는 null일 수 없습니다.");
         }
@@ -41,6 +43,7 @@ public class MqttOutNode extends InNode {
      *
      * @param broker MQTT 브로커의 URL
      * @param clientId 연결에 사용할 클라이언트 ID
+     * @param outPort 브로커 포트 번호
      * @param topic 메시지를 발행할 토픽
      */
     public MqttOutNode(String broker, String clientId, String topic) {

@@ -12,15 +12,17 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Slf4j
 public abstract class OutNode extends Node {
-    private final OutPort port;
+    private OutPort port;
 
-    public OutNode(OutPort port) {
+    public OutNode() {
         super();
-        this.port = port;
+        this.port = null;
     }
 
-    public OutNode(UUID id, OutPort port) {
-        super(id);
+    public void setOutPort(OutPort port) {
+        if(port == null) {
+            throw new IllegalArgumentException("출력력 포트는 null일 수 없습니다.");
+        }
         this.port = port;
     }
 
