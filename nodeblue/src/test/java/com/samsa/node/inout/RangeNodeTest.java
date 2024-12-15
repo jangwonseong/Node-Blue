@@ -31,7 +31,7 @@ class RangeNodeTest {
      * 입력 값이 입력 범위 내에 있을 때의 매핑을 테스트합니다.
      */
     @Test
-    void 범위내_매핑_테스트() {
+    void Range_Mapping_Test() {
         Message inputMessage = new Message(50.0);
         rangeNode.onMessage(inputMessage);
 
@@ -44,7 +44,7 @@ class RangeNodeTest {
      * 입력 값이 범위를 벗어났을 때 제한 동작을 검증합니다.
      */
     @Test
-    void 범위제한_테스트() {
+    void Range_Limit_Test() {
         rangeNode.onMessage(new Message(150.0));
         Message result1 = outPort.getPipes().get(0).poll();
         assertEquals(1.0, (Double) result1.getPayload(), 0.001);
@@ -58,7 +58,7 @@ class RangeNodeTest {
      * 제한 없이 동작할 때를 검증합니다.
      */
     @Test
-    void 제한없는_매핑_테스트() {
+    void Limitless_Test() {
         rangeNode = new RangeNode(UUID.randomUUID(), inPort, outPort, 0, 100, 0, 1, false);
 
         rangeNode.onMessage(new Message(150.0));
@@ -74,7 +74,7 @@ class RangeNodeTest {
      * 잘못된 타입의 payload 처리를 테스트합니다.
      */
     @Test
-    void 잘못된_페이로드_테스트() {
+    void Wrong_Payload_Test() {
         rangeNode.onMessage(new Message("invalid"));
         Message result = outPort.getPipes().get(0).poll();
         assertNull(result);
@@ -84,7 +84,7 @@ class RangeNodeTest {
      * 입력 값이 범위 경계값일 때를 테스트합니다.
      */
     @Test
-    void 경계값_테스트() {
+    void Limit_Value_Test() {
         rangeNode.onMessage(new Message(0.0));
         Message result1 = outPort.getPipes().get(0).poll();
         assertEquals(0.0, (Double) result1.getPayload(), 0.001);

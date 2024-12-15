@@ -18,7 +18,7 @@ class DelayNodeTest {
      * 지연 시간이 음수일 때 예외가 발생하는지 테스트합니다.
      */
     @Test
-    void 음수_지연시간_테스트() {
+    void Minus_Delay_Test() {
         InPort inPort = new InPort(null);
         OutPort outPort = new OutPort(null);
 
@@ -31,7 +31,7 @@ class DelayNodeTest {
      * 메시지가 실제로 지연되는지 테스트합니다.
      */
     @Test
-    void 메시지_지연_테스트() throws InterruptedException {
+    void Message_Delay_Test() throws InterruptedException {
         // 테스트를 위한 DelayNode 생성 (500ms 지연)
         InPort inPort = new InPort(null);
         OutPort outPort = new OutPort(null);
@@ -55,7 +55,7 @@ class DelayNodeTest {
      * null 메시지 처리를 테스트합니다.
      */
     @Test
-    void Null_메시지_테스트() {
+    void Null_Message_Test() {
         InPort inPort = new InPort(null);
         OutPort outPort = new OutPort(null);
         DelayNode delayNode = new DelayNode(UUID.randomUUID(), inPort, outPort, 100);
