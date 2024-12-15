@@ -40,6 +40,8 @@ public class DelayNode extends InOutNode {
         log.info("DelayNode 생성됨. ID: {}, Delay: {} ms", id, delayMillis);
     }
 
+
+
     /**
      * 지정된 ID 없이 DelayNode를 생성합니다. UUID는 자동으로 생성됩니다.
      *
@@ -50,6 +52,7 @@ public class DelayNode extends InOutNode {
     public DelayNode(InPort inPort, OutPort outPort, long delayMillis) {
         this(UUID.randomUUID(), inPort, outPort, delayMillis);
     }
+
 
     /**
      * 메시지를 처리하고 지정된 시간만큼 지연시킨 후 전파합니다. 이 메서드는 메시지를 받아 지정된 시간 동안 대기한 후, 출력 포트로 전달합니다.

@@ -4,15 +4,37 @@ import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * 출력을 생성하는 노드의 추상 클래스입니다.
- * 하나 이상의 출력 파이프를 가질 수 있으며, 생성된 메시지를 다음 노드로 전달합니다.
+ * 출력을 생성하는 노드의 추상 클래스입니다. 하나 이상의 출력 파이프를 가질 수 있으며, 생성된 메시지를 다음 노드로 전달합니다.
  * 
  * @author samsa
  * @since 1.0
  */
 @Slf4j
 public abstract class OutNode extends Node {
-    private final OutPort port;
+    private OutPort port;
+
+
+    // 새로운 생성자 추가 (포트를 나중에 설정)
+    public OutNode() {
+        super();
+    }
+
+    public OutNode(UUID id) {
+        super(id);
+    }
+
+    // Setter로 포트를 나중에 설정
+    public void setPort(OutPort port) {
+        if (port == null) {
+            log.error("입력 포트를 null로 설정하려고 합니다. NodeId: {}", getId());
+            throw new IllegalArgumentException("입력 포트는 null일 수 없습니다");
+        }
+        this.port = port;
+    }
+
+    public OutPort getPort() {
+        return port;
+    }
 
     public OutNode(OutPort port) {
         super();
@@ -25,11 +47,10 @@ public abstract class OutNode extends Node {
     }
 
     /**
-     * 메시지를 연결된 모든 출력 파이프로 전송합니다.
-     * 출력 포트가 null이거나 메시지가 null인 경우 예외가 발생합니다.
+     * 메시지를 연결된 모든 출력 파이프로 전송합니다. 출력 포트가 null이거나 메시지가 null인 경우 예외가 발생합니다.
      *
      * @param message 전송할 메시지 객체
-     * @throws IllegalStateException    출력 포트가 초기화되지 않은 경우
+     * @throws IllegalStateException 출력 포트가 초기화되지 않은 경우
      * @throws IllegalArgumentException 메시지가 null인 경우
      */
     public void emit(Message message) {
@@ -53,8 +74,7 @@ public abstract class OutNode extends Node {
     }
 
     /**
-     * OutNode는 메시지를 받을 수 없으므로 이 메서드를 호출하면 예외가 발생합니다.
-     * 출력 전용 노드이므로 메시지 수신 기능은 지원하지 않습니다.
+     * OutNode는 메시지를 받을 수 없으므로 이 메서드를 호출하면 예외가 발생합니다. 출력 전용 노드이므로 메시지 수신 기능은 지원하지 않습니다.
      *
      * @param message 수신된 메시지 객체
      * @throws UnsupportedOperationException 이 메서드가 호출될 경우 항상 발생
