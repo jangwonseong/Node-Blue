@@ -2,7 +2,9 @@ package com.samsa.node.inout;
 
 import com.samsa.core.InPort;
 import com.samsa.core.OutPort;
+import com.samsa.core.Pipe;
 import com.samsa.core.Message;
+import com.samsa.core.Node;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -10,20 +12,32 @@ import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-/**
- * RangeNode의 기능을 테스트하는 클래스입니다.
- */
 class RangeNodeTest {
-
     private RangeNode rangeNode;
     private InPort inPort;
     private OutPort outPort;
+    private Node dummyNode;
+    private Pipe pipe;
 
     @BeforeEach
     void setUp() {
-        // 테스트용 RangeNode 생성
-        inPort = new InPort(null);
-        outPort = new OutPort(null);
+        // 더미 노드 생성
+        dummyNode = new Node() {
+            @Override
+            public void onMessage(Message message) {
+                // 테스트용 더미 메서드
+            }
+        };
+
+        // 포트 생성
+        inPort = new InPort(dummyNode);
+        outPort = new OutPort(dummyNode);
+
+        // 파이프 생성 및 연결
+        pipe = new Pipe();
+        outPort.addPipe(pipe);
+
+        // RangeNode 생성
         rangeNode = new RangeNode(UUID.randomUUID(), inPort, outPort, 0, 100, 0, 1, true);
     }
 

@@ -3,64 +3,80 @@ package com.samsa.node.inout;
 import com.samsa.core.InPort;
 import com.samsa.core.OutPort;
 import com.samsa.core.Message;
+import com.samsa.core.Node;
+import com.samsa.node.inout.DelayNode;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-/**
- * DelayNode의 기본적인 기능을 테스트하는 클래스입니다.
- */
 class DelayNodeTest {
 
-    /**
-     * 지연 시간이 음수일 때 예외가 발생하는지 테스트합니다.
-     */
-    @Test
-    void Minus_Delay_Test() {
-        InPort inPort = new InPort(null);
-        OutPort outPort = new OutPort(null);
+    private Node dummyNode;
+    private InPort inPort;
+    private OutPort outPort;
 
+    @BeforeEach
+    void setUp() {
+        dummyNode = new Node() {
+            @Override
+            public void onMessage(Message message) {
+                // 테스트용 더미 메서드
+            }
+        };
+        inPort = new InPort(dummyNode);
+        outPort = new OutPort(dummyNode);
+    }
+
+    @Test
+    void testNegativeDelayTime() {
         assertThrows(IllegalArgumentException.class, () -> {
             new DelayNode(UUID.randomUUID(), inPort, outPort, -1000);
         });
     }
 
-    /**
-     * 메시지가 실제로 지연되는지 테스트합니다.
-     */
     @Test
-    void Message_Delay_Test() throws InterruptedException {
-        // 테스트를 위한 DelayNode 생성 (500ms 지연)
-        InPort inPort = new InPort(null);
-        OutPort outPort = new OutPort(null);
+    void testMessageDelay() throws InterruptedException {
         DelayNode delayNode = new DelayNode(UUID.randomUUID(), inPort, outPort, 500);
 
-        // 시작 시간 기록
         long startTime = System.currentTimeMillis();
-
-        // 메시지 전송
         Message message = new Message("테스트 메시지");
         delayNode.onMessage(message);
-
-        // 경과 시간 확인
         long elapsedTime = System.currentTimeMillis() - startTime;
 
-        // 지연 시간(500ms)보다 경과 시간이 큰지 확인
         assertTrue(elapsedTime >= 500);
     }
 
-    /**
-     * null 메시지 처리를 테스트합니다.
-     */
     @Test
-    void Null_Message_Test() {
-        InPort inPort = new InPort(null);
-        OutPort outPort = new OutPort(null);
+    void testNullMessage() {
         DelayNode delayNode = new DelayNode(UUID.randomUUID(), inPort, outPort, 100);
-
-        // null 메시지 전송 시 예외가 발생하지 않아야 함
         assertDoesNotThrow(() -> delayNode.onMessage(null));
     }
+
+    @Test
+    void testGetDelayMillis() {
+        long expectedDelay = 1000;
+        DelayNode delayNode = new DelayNode(UUID.randomUUID(), inPort, outPort, expectedDelay);
+        assertEquals(expectedDelay, delayNode.getDelayMillis());
+    }
+
+    @Test
+    void testRunMethod() throws InterruptedException {
+        DelayNode delayNode = new DelayNode(UUID.randomUUID(), inPort, outPort, 100);
+        Thread thread = new Thread(delayNode);
+        thread.start();
+
+        // Add small delay to allow status change
+        Thread.sleep(100);
+
+        assertTrue(delayNode.getStatus() == Node.NodeStatus.RUNNING);
+
+        delayNode.stop();
+        thread.join(500);
+
+        assertTrue(delayNode.getStatus() == Node.NodeStatus.STOPPED);
+    }
+
 }
