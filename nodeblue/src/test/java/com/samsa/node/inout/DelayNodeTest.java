@@ -1,9 +1,9 @@
 package com.samsa.node.inout;
 
-import com.samsa.core.InPort;
-import com.samsa.core.OutPort;
+import com.samsa.core.port.InPort;
+import com.samsa.core.port.OutPort;
 import com.samsa.core.Message;
-import com.samsa.core.Node;
+import com.samsa.core.node.Node;
 import com.samsa.node.inout.DelayNode;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

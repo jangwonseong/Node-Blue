@@ -10,7 +10,6 @@ import org.eclipse.paho.client.mqttv3.MqttClient;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 
 import com.samsa.core.Message;
-import com.samsa.core.OutNode;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -79,3 +78,4 @@ public class MqttInNode { // extends OutNode{
     // }
     // }
 }
+

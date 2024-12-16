@@ -6,7 +6,6 @@ import org.eclipse.paho.client.mqttv3.MqttClient;
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 
-import com.samsa.core.InNode;
 import com.samsa.core.Message;
 
 /**
@@ -85,3 +84,4 @@ public class MqttOutNode { // extends InNode {
     // }
     // }
 }
+

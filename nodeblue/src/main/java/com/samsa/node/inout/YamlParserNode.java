@@ -4,7 +4,7 @@ import java.util.UUID;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.dataformat.yaml.YAMLMapper;
-import com.samsa.core.InOutNode;
+
 import com.samsa.core.Message;
 
 import lombok.extern.slf4j.Slf4j;
@@ -86,3 +86,4 @@ public class YamlParserNode {// extends InOutNode {
     // return YAML_MAPPER.writeValueAsString(payload);
     // }
 }
+

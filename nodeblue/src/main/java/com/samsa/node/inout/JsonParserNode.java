@@ -4,7 +4,7 @@ import java.util.UUID;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.samsa.core.InOutNode;
+import com.samsa.core.node.InOutNode;
 import com.samsa.core.Message;
 
 import lombok.extern.slf4j.Slf4j;
@@ -87,3 +87,4 @@ public class JsonParserNode {// extends InOutNode {
     // }
     // }
 }
+
