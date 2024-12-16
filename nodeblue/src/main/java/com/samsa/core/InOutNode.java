@@ -12,42 +12,25 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Slf4j
 public abstract class InOutNode extends Node {
-    private final InPort inPort;
-    private final OutPort outPort;
+    private InPort inPort;
+    private OutPort outPort;
 
     /**
-     * 지정된 입출력 포트로 InOutNode를 생성합니다.
-     *
-     * @param inPort  입력 포트
-     * @param outPort 출력 포트
-     * @throws IllegalArgumentException 입력 또는 출력 포트가 null인 경우
+     * InOutNode를 생성합니다.
      */
-    public InOutNode(InPort inPort, OutPort outPort) {
-        super();
-        if (inPort == null || outPort == null) {
-            log.error("입력 또는 출력 포트가 null입니다");
-            throw new IllegalArgumentException("포트는 null일 수 없습니다");
-        }
-        this.inPort = inPort;
-        this.outPort = outPort;
+    public InOutNode() {
+        this(UUID.randomUUID());
     }
 
     /**
      * 지정된 ID와 입출력 포트로 InOutNode를 생성합니다.
      *
-     * @param id      노드의 고유 식별자
-     * @param inPort  입력 포트
-     * @param outPort 출력 포트
-     * @throws IllegalArgumentException ID, 입력 또는 출력 포트가 null인 경우
+     * @param id 노드의 고유 식별자
      */
-    public InOutNode(UUID id, InPort inPort, OutPort outPort) {
+    public InOutNode(UUID id) {
         super(id);
-        if (inPort == null || outPort == null) {
-            log.error("입력 또는 출력 포트가 null입니다. NodeId: {}", id);
-            throw new IllegalArgumentException("포트는 null일 수 없습니다");
-        }
-        this.inPort = inPort;
-        this.outPort = outPort;
+        this.inPort = new InPort(this);
+        this.outPort = new OutPort(this);
     }
 
     /**

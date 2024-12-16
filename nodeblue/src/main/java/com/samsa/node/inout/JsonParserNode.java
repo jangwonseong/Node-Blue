@@ -31,8 +31,8 @@ public class JsonParserNode extends InOutNode {
      * @param targetClass JSON 문자열을 변환할 대상 클래스
      * @throws IllegalArgumentException 입력 또는 출력 포트가 null인 경우
      */
-    public JsonParserNode(UUID id, InPort inPort, OutPort outPort, Class<?> targetClass) {
-        super(id, inPort, outPort);
+    public JsonParserNode(UUID id, Class<?> targetClass) {
+        super(id);
         if (targetClass == null) {
             log.error("타겟 클래스가 null입니다. NodeId: {}", id);
             throw new IllegalArgumentException("타겟 클래스는 null일 수 없습니다.");

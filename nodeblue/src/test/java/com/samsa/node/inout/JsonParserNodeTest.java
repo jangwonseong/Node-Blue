@@ -23,7 +23,7 @@ class JsonParserNodeTest {
     void setUp() {
         inPort = mock(InPort.class);
         outPort = mock(OutPort.class);
-        jsonParserNode = new JsonParserNode(nodeId, inPort, outPort, TestData.class);
+        jsonParserNode = new JsonParserNode(nodeId, TestData.class);
     }
 
     @Test

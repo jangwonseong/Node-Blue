@@ -24,7 +24,7 @@ class YamlParserNodeTest {
     void setUp() {
         inPort = mock(InPort.class);
         outPort = mock(OutPort.class);
-        yamlParserNode = new YamlParserNode(nodeId, inPort, outPort, TestData.class);
+        yamlParserNode = new YamlParserNode(nodeId, TestData.class);
     }
 
     @Test

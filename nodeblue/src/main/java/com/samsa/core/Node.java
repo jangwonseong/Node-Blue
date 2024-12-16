@@ -4,7 +4,6 @@ import java.util.UUID;
 
 import lombok.extern.slf4j.Slf4j;
 
-
 /**
  * 모든 노드의 기본 추상 클래스입니다.
  * 노드의 생명주기와 기본적인 에러 처리를 관리합니다.
@@ -133,30 +132,30 @@ public abstract class Node implements Runnable {
             throw new IllegalArgumentException("Invalid UUID string", e);
         }
     }
-}
-
-/**
- * 노드의 상태를 나타내는 열거형입니다.
- */
-enum NodeStatus {
 
     /**
-     * 노드가 생성된 초기 상태
+     * 노드의 상태를 나타내는 열거형입니다.
      */
-    CREATED,
+    public enum NodeStatus {
 
-    /**
-     * 노드가 실행 중인 상태
-     */
-    RUNNING,
+        /**
+         * 노드가 생성된 초기 상태
+         */
+        CREATED,
 
-    /**
-     * 노드가 중지된 상태
-     */
-    STOPPED,
+        /**
+         * 노드가 실행 중인 상태
+         */
+        RUNNING,
 
-    /**
-     * 노드에 에러가 발생한 상태
-     */
-    ERROR
+        /**
+         * 노드가 중지된 상태
+         */
+        STOPPED,
+
+        /**
+         * 노드에 에러가 발생한 상태
+         */
+        ERROR
+    }
 }

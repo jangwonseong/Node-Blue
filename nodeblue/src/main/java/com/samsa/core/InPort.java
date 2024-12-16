@@ -16,11 +16,6 @@ public class InPort {
     private UUID id;
 
     /**
-     * 이 InPort의 소유 노드입니다.
-     */
-    private Node owner;
-
-    /**
      * 연결된 파이프들의 목록입니다.
      */
     private List<Pipe> pipes;
@@ -47,7 +42,6 @@ public class InPort {
             throw new IllegalArgumentException("Node cannot be null");
         }
         this.id = id;
-        this.owner = node;
         this.pipes = new ArrayList<>();
     }
 
@@ -112,15 +106,6 @@ public class InPort {
      */
     public UUID getId() {
         return id;
-    }
-
-    /**
-     * 이 InPort의 소유 노드를 반환합니다.
-     *
-     * @return 소유 노드
-     */
-    public Node getOwner() {
-        return owner;
     }
 
     /**

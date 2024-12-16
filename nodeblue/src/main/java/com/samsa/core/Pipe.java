@@ -4,10 +4,19 @@ import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
+import lombok.extern.slf4j.Slf4j;
 
+/**
+ * 노드 간의 메시지 전달을 위한 파이프를 구현합니다.
+ * FIFO(First In First Out) 방식의 메시지 큐를 사용합니다.
+ */
+@Slf4j
 public class Pipe {
+    /** 파이프의 고유 식별자 */
     private final UUID id;
+    /** 메시지를 저장하는 큐 */
     private final BlockingQueue<Message> queue;
+    /** 기본 큐 용량 */
     private static final int DEFAULT_CAPACITY = 1024;
 
     /**
@@ -19,10 +28,18 @@ public class Pipe {
 
     /**
      * 지정된 용량의 파이프를 생성합니다.
+     *
+     * @param capacity 파이프의 최대 용량
+     * @throws IllegalArgumentException 용량이 0 이하인 경우
      */
     public Pipe(int capacity) {
+        if (capacity <= 0) {
+            log.error("파이프 용량은 0보다 커야 합니다: {}", capacity);
+            throw new IllegalArgumentException("Capacity must be greater than 0");
+        }
         this.id = UUID.randomUUID();
         this.queue = new ArrayBlockingQueue<>(capacity);
+        log.debug("파이프 생성됨. ID: {}, 용량: {}", id, capacity);
     }
 
     /**
@@ -82,7 +99,7 @@ public class Pipe {
      */
     @Override
     public String toString() {
-        return String.format("Pipe[id=%s, size=%d, capacity=%d]", id, queue.size(),
-                queue.size() + queue.remainingCapacity());
+        return String.format("Pipe[id=%s, size=%d, capacity=%d]",
+                id, queue.size(), queue.size() + queue.remainingCapacity());
     }
 }

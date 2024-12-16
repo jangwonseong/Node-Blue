@@ -12,7 +12,7 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Slf4j
 public abstract class InNode extends Node {
-    private final InPort port;
+    private InPort port;
 
     /**
      * 지정된 입력 포트로 InNode를 생성합니다.
@@ -20,13 +20,8 @@ public abstract class InNode extends Node {
      * @param port 입력 포트
      * @throws IllegalArgumentException 포트가 null인 경우
      */
-    public InNode(InPort port) {
-        super();
-        if (port == null) {
-            log.error("입력 포트가 null입니다");
-            throw new IllegalArgumentException("입력 포트는 null일 수 없습니다");
-        }
-        this.port = port;
+    public InNode() {
+        this(UUID.randomUUID());
     }
 
     /**
@@ -36,13 +31,9 @@ public abstract class InNode extends Node {
      * @param port 입력 포트
      * @throws IllegalArgumentException ID 또는 포트가 null인 경우
      */
-    public InNode(UUID id, InPort port) {
+    public InNode(UUID id) {
         super(id);
-        if (port == null) {
-            log.error("입력 포트가 null입니다. NodeId: {}", id);
-            throw new IllegalArgumentException("입력 포트는 null일 수 없습니다");
-        }
-        this.port = port;
+        this.port = new InPort(this);
     }
 
     /**

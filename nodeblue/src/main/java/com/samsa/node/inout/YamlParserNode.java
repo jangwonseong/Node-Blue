@@ -32,8 +32,8 @@ public class YamlParserNode extends InOutNode {
      * @param targetClass YAML 문자열을 변환할 대상 클래스
      * @throws IllegalArgumentException 입력 포트, 출력 포트, 또는 타겟 클래스가 null인 경우
      */
-    public YamlParserNode(UUID id, InPort inPort, OutPort outPort, Class<?> targetClass) {
-        super(id, inPort, outPort);
+    public YamlParserNode(UUID id, Class<?> targetClass) {
+        super(id);
         if (targetClass == null) {
             log.error("타겟 클래스가 null입니다. NodeId: {}", id);
             throw new IllegalArgumentException("타겟 클래스는 null일 수 없습니다.");
