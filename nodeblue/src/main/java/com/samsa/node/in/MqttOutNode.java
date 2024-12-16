@@ -62,6 +62,7 @@ public class MqttOutNode extends InNode {
             log.info("MQTT 클라이언트 생성 완료");
             mqttClient.connect();
             log.info("MQTT 브로커 연결 성공: {}", broker);
+            onMessage(receive());
         } catch (MqttException e) {
             log.error("MQTT 브로커 연결 실패", e);
         }
