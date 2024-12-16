@@ -16,7 +16,7 @@ public abstract class OutNode extends Node {
 
     public OutNode() {
         super();
-        this.port = null;
+        this.port = new OutPort(this);
     }
 
     public void setOutPort(OutPort port) {

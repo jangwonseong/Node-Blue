@@ -3,6 +3,7 @@ package com.samsa.node.out;
 import org.junit.jupiter.api.*;
 
 import com.samsa.core.InPort;
+import com.samsa.core.Message;
 import com.samsa.core.OutPort;
 import com.samsa.core.Pipe;
 import com.samsa.node.in.MqttOutNode;
@@ -17,12 +18,21 @@ class MqttIntNodeTest {
 
     @BeforeEach
     void setUp() {
-        // String[] topics = {"application/#", "123"};
-        // mqttInNode = new MqttInNode("tcp://192.168.70.203:1883", "1235", topics); // 노드부터 만들었을 때
-        // OutPort outPort = new OutPort(mqttInNode);
-        // Pipe pipe = new Pipe();
-        // outPort.addPipe(pipe);
-        // mqttInNode.setOutPort(outPort);
+        String[] topics = {"application/#", "123"};
+        mqttInNode = new MqttInNode("tcp://192.168.70.203:1883", "1235", topics); // 노드부터 만들었을 때
+        OutPort outPort = new OutPort(mqttInNode);
+        Pipe pipe = new Pipe();
+        outPort.addPipe(pipe);
+        mqttInNode.setOutPort(outPort);
+
+        pipe.offer(new Message("dddddddddd2"));
+        pipe.offer(new Message("dddddddddd12"));
+        pipe.offer(new Message("dddddddddd123"));
+
+        mqttOutNode = new MqttOutNode("tcp://192.168.70.203:1883", "12356", "app");
+        InPort inPort = new InPort(mqttOutNode);
+        inPort.addPipe(pipe);
+        mqttOutNode.setInPort(inPort);
     }
 
     // @Test
@@ -35,14 +45,21 @@ class MqttIntNodeTest {
 
     @Test
     void start() {
-        String[] topics = {"application/#", "123"};
-        mqttInNode = new MqttInNode("tcp://192.168.70.203:1883", "1235", topics); // 노드부터 만들었을 때
-        OutPort outPort = new OutPort(mqttInNode);
-        Pipe pipe = new Pipe();
-        outPort.addPipe(pipe);
-        mqttInNode.setOutPort(outPort);
-
         mqttInNode.start();
+
+        try {
+            Thread.sleep(1000000);
+        } catch (InterruptedException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        // Assertions.assertDoesNotThrow(() -> mqttInNode.start());
+    }
+
+    @Test
+    void start2() {
+        mqttOutNode.start();
+
         try {
             Thread.sleep(1000000);
         } catch (InterruptedException e) {

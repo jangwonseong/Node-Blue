@@ -135,24 +135,24 @@ public class OutPort {
     public List<Pipe> getPipes() {
         return new ArrayList<>(pipes);
     }
-    public static void main(String[] args) {
-        MqttInNode mqttInNode;
-        String[] topics = {"application/#", "123"};
-        mqttInNode = new MqttInNode("tcp://192.168.70.203:1883", "1235", topics); // 노드부터 만들었을 때
-        OutPort outPort = new OutPort(mqttInNode);
-        Pipe pipe = new Pipe();
-        outPort.addPipe(pipe);
-        mqttInNode.setOutPort(outPort);
+    // public static void main(String[] args) {
+    //     MqttInNode mqttInNode;
+    //     String[] topics = {"application/#", "123"};
+    //     mqttInNode = new MqttInNode("tcp://192.168.70.203:1883", "1235", topics); // 노드부터 만들었을 때
+    //     OutPort outPort = new OutPort(mqttInNode);
+    //     Pipe pipe = new Pipe();
+    //     outPort.addPipe(pipe);
+    //     mqttInNode.setOutPort(outPort);
 
-        mqttInNode.start();
-        // log.info(pipe.poll().toString());
+    //     mqttInNode.start();
+    //     // log.info(pipe.poll().toString());
         
-        try {
-            Thread.sleep(1000000);
-        } catch (InterruptedException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-        // Assertions.assertDoesNotThrow(() -> mqttInNode.start());
-    }
+    //     try {
+    //         Thread.sleep(1000000);
+    //     } catch (InterruptedException e) {
+    //         // TODO Auto-generated catch block
+    //         e.printStackTrace();
+    //     }
+    //     // Assertions.assertDoesNotThrow(() -> mqttInNode.start());
+    // }
 }

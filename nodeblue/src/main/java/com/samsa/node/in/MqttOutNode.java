@@ -62,7 +62,12 @@ public class MqttOutNode extends InNode {
             log.info("MQTT 클라이언트 생성 완료");
             mqttClient.connect();
             log.info("MQTT 브로커 연결 성공: {}", broker);
-            onMessage(receive());
+            
+            // 큐에 있는 모든 메시지를 꺼내 처리
+            Message message;
+            while ((message = receive()) != null) {
+                onMessage(message);
+            }
         } catch (MqttException e) {
             log.error("MQTT 브로커 연결 실패", e);
         }
@@ -81,6 +86,7 @@ public class MqttOutNode extends InNode {
         }
 
         try {
+            log.info(message.toString());
             MqttMessage mqttMessage = new MqttMessage(message.getPayload().toString().getBytes());
             mqttClient.publish(topic, mqttMessage);
             log.info("메시지가 토픽 '{}'에 발행되었습니다.", topic);
