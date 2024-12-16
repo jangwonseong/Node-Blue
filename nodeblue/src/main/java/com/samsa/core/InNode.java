@@ -20,7 +20,7 @@ public abstract class InNode extends Node {
      * @param port 입력 포트
      * @throws IllegalArgumentException 포트가 null인 경우
      */
-    public InNode() {
+    protected InNode() {
         this(UUID.randomUUID());
     }
 
@@ -31,7 +31,7 @@ public abstract class InNode extends Node {
      * @param port 입력 포트
      * @throws IllegalArgumentException ID 또는 포트가 null인 경우
      */
-    public InNode(UUID id) {
+    protected InNode(UUID id) {
         super(id);
         this.port = new InPort(this);
     }
