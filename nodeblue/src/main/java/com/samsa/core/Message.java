@@ -6,8 +6,7 @@ import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * 노드 간에 전달되는 메시지를 나타내는 클래스입니다.
- * 각 메시지는 고유한 ID와 페이로드를 가지며, 노드 간 통신의 기본 단위가 됩니다.
+ * 노드 간에 전달되는 메시지를 나타내는 클래스입니다. 각 메시지는 고유한 ID와 페이로드를 가지며, 노드 간 통신의 기본 단위가 됩니다.
  * 
  * @author samsa
  * @since 1.0
@@ -59,8 +58,8 @@ public class Message {
         this.id = UUID.randomUUID();
         this.payload = payload;
         this.metadata = new HashMap<>(metadata);
-        log.debug("메타데이터 포함 메시지 생성됨. ID: {}, Payload 타입: {}, Metadata 크기: {}",
-                id, payload.getClass().getSimpleName(), metadata.size());
+        log.debug("메타데이터 포함 메시지 생성됨. ID: {}, Payload 타입: {}, Metadata 크기: {}", id,
+                payload.getClass().getSimpleName(), metadata.size());
     }
 
     /**
@@ -87,8 +86,8 @@ public class Message {
         this.id = id;
         this.payload = payload;
         this.metadata = new HashMap<>(metadata);
-        log.debug("전체 지정 메시지 생성됨. ID: {}, Payload 타입: {}, Metadata 크기: {}",
-                id, payload.getClass().getSimpleName(), metadata.size());
+        log.debug("전체 지정 메시지 생성됨. ID: {}, Payload 타입: {}, Metadata 크기: {}", id,
+                payload.getClass().getSimpleName(), metadata.size());
     }
 
     public UUID getId() {
