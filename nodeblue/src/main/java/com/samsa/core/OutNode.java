@@ -12,16 +12,21 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Slf4j
 public abstract class OutNode extends Node {
-    private final OutPort port;
+    private OutPort port;
 
-    public OutNode(OutPort port) {
-        super();
-        this.port = port;
+    public OutNode() {
+        this(UUID.randomUUID());
     }
 
-    public OutNode(UUID id, OutPort port) {
+    /**
+     * 지정된 ID와 입력 포트로 OutNode를 생성합니다.
+     *
+     * @param id 노드의 고유 식별자
+     */
+
+    public OutNode(UUID id) {
         super(id);
-        this.port = port;
+        this.port = new OutPort(this);
     }
 
     /**

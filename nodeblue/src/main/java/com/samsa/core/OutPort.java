@@ -13,8 +13,7 @@ import lombok.extern.slf4j.Slf4j;
 public class OutPort {
     /** 출력 포트의 고유 식별자 */
     private final UUID id;
-    /** 이 출력 포트의 소유 노드 */
-    private final Node owner;
+
     /** 연결된 파이프들의 목록 */
     private final List<Pipe> pipes;
 
@@ -41,7 +40,6 @@ public class OutPort {
             throw new IllegalArgumentException("Node cannot be null");
         }
         this.id = id;
-        this.owner = node;
         this.pipes = new ArrayList<>();
     }
 
@@ -111,15 +109,6 @@ public class OutPort {
      */
     public UUID getId() {
         return id;
-    }
-
-    /**
-     * 이 OutPort의 소유 노드를 반환합니다.
-     *
-     * @return 소유 노드
-     */
-    public Node getOwner() {
-        return owner;
     }
 
     /**
