@@ -17,7 +17,7 @@ public class Message {
     private final UUID id;
 
     /** 메시지의 실제 데이터 */
-    private final Object payload;
+    private Object payload;
 
     /** 메시지의 부가 정보 */
     private final Map<String, Object> metadata;
@@ -96,6 +96,10 @@ public class Message {
 
     public Object getPayload() {
         return payload;
+    }
+
+    public void setPayload(Object payload) {
+        this.payload = payload;
     }
 
     public Map<String, Object> getMetadata() {
