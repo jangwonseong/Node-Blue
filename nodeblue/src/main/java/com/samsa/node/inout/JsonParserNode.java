@@ -4,10 +4,8 @@ import java.util.UUID;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.samsa.core.InOutNode;
-import com.samsa.core.InPort;
 import com.samsa.core.Message;
-import com.samsa.core.OutPort;
+import com.samsa.core.node.InOutNode;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -26,8 +24,6 @@ public class JsonParserNode extends InOutNode {
      * JsonParserNode 객체를 생성합니다.
      *
      * @param id 노드의 고유 식별자
-     * @param inPort 입력 포트
-     * @param outPort 출력 포트
      * @param targetClass JSON 문자열을 변환할 대상 클래스
      * @throws IllegalArgumentException 입력 또는 출력 포트가 null인 경우
      */
@@ -80,22 +76,6 @@ public class JsonParserNode extends InOutNode {
         } catch (Exception e) {
             log.error("메시지 처리 중 예기치 못한 오류 발생. NodeId: {}, MessageId: {}, 오류: {}", getId(),
                     message.getId(), e.getMessage(), e);
-        }
-    }
-
-    /**
-     * 노드 실행 시작 시 초기 메시지를 처리합니다.
-     *
-     * <p>
-     * 이 메서드는 노드가 실행되면 입력 포트에서 첫 메시지를 수신하고 이를 처리합니다.
-     * </p>
-     */
-    @Override
-    public void start() {
-        try {
-            onMessage(receive());
-        } catch (Exception e) {
-            log.error("노드 시작 중 메시지 처리 오류 발생. NodeId: {}, 오류: {}", getId(), e.getMessage(), e);
         }
     }
 
