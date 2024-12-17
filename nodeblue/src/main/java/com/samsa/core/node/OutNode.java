@@ -18,7 +18,7 @@ public abstract class OutNode extends Node {
         port = new OutPort();
     }
 
-    private void emit(Message message) {
+    protected void emit(Message message) {
         if (port == null) {
             log.error("출력 포트가 초기화되지 않았습니다. NodeId: {}", getId());
             throw new IllegalStateException("출력 포트가 초기화되지 않았습니다");
@@ -38,6 +38,7 @@ public abstract class OutNode extends Node {
         }
     }
 
+    // 변경사항...
     protected abstract Message createMessage();
 
     @Override
@@ -45,6 +46,7 @@ public abstract class OutNode extends Node {
         while (true) {
             try {
                 Message message = createMessage(); // 메시지 생성 로직을 자식 클래스에 위임
+                log.info("메시지 출력!!! @@@ !!!!");
                 emit(message);
                 Thread.sleep(1000);
             } catch (InterruptedException e) {
