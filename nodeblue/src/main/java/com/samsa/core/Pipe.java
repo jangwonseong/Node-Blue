@@ -8,7 +8,7 @@ import java.util.concurrent.BlockingQueue;
 public class Pipe {
     private final UUID id;
     private final BlockingQueue<Message> queue;
-    private static final int DEFAULT_CAPACITY = 1;
+    private static final int DEFAULT_CAPACITY = 1024;
 
     public Pipe() {
         this(DEFAULT_CAPACITY);

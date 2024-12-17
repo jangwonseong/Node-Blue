@@ -122,7 +122,7 @@ public class ModbusNode extends OutNode {
             }
 
             log.info("Modbus에서 {}개의 레지스터를 성공적으로 읽어왔습니다.", numOfRegisters);
-            return new Message(response.getShortData());
+            return new Message((response.getShortData()[0]));
         } catch (ModbusTransportException e) {
             log.error("Modbus 전송 오류 발생: {}", e.getMessage(), e);
             return null;
