@@ -30,7 +30,7 @@ public class ReadWrite {
      * @param args 명령행 인자 (사용하지 않음)
      */
     public static void main(String[] args) {
-        Path filePath = Paths.get("./log/log2.log").toAbsolutePath();
+        Path filePath = Paths.get("./log/log.log").toAbsolutePath();
 
         WriteFileNode writer = new WriteFileNode(filePath, true);
         ReadFileNode reader = new ReadFileNode(filePath, true);

@@ -3,48 +3,75 @@ package com.samsa;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import lombok.extern.slf4j.Slf4j;
+
 /**
- * LogParser 클래스는 로그 파일을 파싱하여 로그 레벨별로 메시지를 분류하는 기능을 제공합니다.
- * 지원하는 로그 레벨은 DEBUG, INFO, WARN, ERROR입니다.
+ * 로그 파일을 파싱하고 분석하는 기능을 제공하는 클래스입니다.
+ * 다양한 필터링 옵션과 검색 기능을 지원합니다.
  * 
- * <p>
- * 이 클래스는 로그 파일을 읽어서 각 로그 레벨별로 메시지를 분류하고,
- * 분류된 결과를 맵 형태로 제공합니다.
- * </p>
+ * <p>주요 기능:</p>
+ * <ul>
+ *   <li>로그 레벨별 메시지 분류</li>
+ *   <li>시간 범위 기반 필터링</li>
+ *   <li>로그 레벨 우선순위 기반 필터링</li>
+ *   <li>키워드 기반 검색</li>
+ * </ul>
  *
  * @author samsa
- * @version 1.0
+ * @version 2.0
  */
+@Slf4j
 public class LogParser {
-
     /** 파싱할 로그 파일의 경로 */
-    private String filePath;
+    private final String filePath;
+    
+    /** 로그 레벨의 우선순위를 정의하는 열거형 */
+    public enum LogLevel {
+        DEBUG(0),
+        INFO(1),
+        WARN(2),
+        ERROR(3);
+
+        private final int priority;
+
+        LogLevel(int priority) {
+            this.priority = priority;
+        }
+
+        public int getPriority() {
+            return priority;
+        }
+    }
 
     /**
      * LogParser 객체를 생성합니다.
      *
      * @param filePath 파싱할 로그 파일의 경로
+     * @throws IllegalArgumentException filePath가 null인 경우
      */
     public LogParser(String filePath) {
+        if (filePath == null) {
+            throw new IllegalArgumentException("파일 경로는 null일 수 없습니다");
+        }
         this.filePath = filePath;
     }
 
     /**
-     * 로그 파일을 파싱하여 로그 레벨별로 메시지를 분류합니다.
+     * 모든 로그를 레벨별로 분류하여 반환합니다.
      *
      * @return 로그 레벨을 키로 하고 해당 레벨의 로그 메시지 리스트를 값으로 하는 맵
      */
     public Map<String, List<String>> getLogsByLevel() {
         Map<String, List<String>> logsByLevel = new HashMap<>();
-
         try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
             String line;
-
             while ((line = reader.readLine()) != null) {
                 String logLevel = extractLogLevel(line);
                 if (logLevel != null) {
@@ -53,38 +80,94 @@ public class LogParser {
                 }
             }
         } catch (IOException e) {
-            System.err.println("Error reading the log file : " + e.getMessage());
+            log.error("로그 파일 읽기 오류: {}", e.getMessage());
         }
         return logsByLevel;
     }
 
     /**
-     * 주어진 로그 라인에서 로그 레벨을 추출합니다.
+     * 특정 로그 레벨의 메시지만 필터링하여 반환합니다.
      *
-     * @param line 파싱할 로그 라인
-     * @return 로그 레벨 문자열, 로그 레벨이 없는 경우 null
+     * @param targetLevel 필터링할 로그 레벨
+     * @return 지정된 레벨의 로그 메시지 리스트
      */
+    public List<String> getLogsBySpecificLevel(LogLevel targetLevel) {
+        List<String> filteredLogs = new ArrayList<>();
+        try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                String logLevel = extractLogLevel(line);
+                if (logLevel != null && LogLevel.valueOf(logLevel) == targetLevel) {
+                    filteredLogs.add(line);
+                }
+            }
+        } catch (IOException e) {
+            log.error("로그 파일 읽기 오류: {}", e.getMessage());
+        }
+        return filteredLogs;
+    }
+
+    /**
+     * 지정된 시간 범위 내의 로그 메시지를 반환합니다.
+     *
+     * @param start 시작 시간
+     * @param end 종료 시간
+     * @return 시간 범위 내의 로그 메시지 리스트
+     */
+    public List<String> getLogsByTimeRange(LocalDateTime start, LocalDateTime end) {
+        List<String> filteredLogs = new ArrayList<>();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        
+        try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                LocalDateTime logTime = extractTimestamp(line, formatter);
+                if (logTime != null && !logTime.isBefore(start) && !logTime.isAfter(end)) {
+                    filteredLogs.add(line);
+                }
+            }
+        } catch (IOException e) {
+            log.error("로그 파일 읽기 오류: {}", e.getMessage());
+        }
+        return filteredLogs;
+    }
+
+    /**
+     * 지정된 키워드가 포함된 로그 메시지를 검색합니다.
+     *
+     * @param keyword 검색할 키워드
+     * @return 키워드가 포함된 로그 메시지 리스트
+     */
+    public List<String> searchLogsByKeyword(String keyword) {
+        List<String> matchedLogs = new ArrayList<>();
+        try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                if (line.contains(keyword)) {
+                    matchedLogs.add(line);
+                }
+            }
+        } catch (IOException e) {
+            log.error("로그 파일 읽기 오류: {}", e.getMessage());
+        }
+        return matchedLogs;
+    }
+
     private String extractLogLevel(String line) {
-        String[] logLevels = { "DEBUG", "INFO", "WARN", "ERROR" };
-        for (String level : logLevels) {
-            if (line.contains(" " + level + " ")) {
-                return level;
+        for (LogLevel level : LogLevel.values()) {
+            if (line.contains(" " + level.name() + " ")) {
+                return level.name();
             }
         }
         return null;
     }
 
-    public static void main(String[] args) {
-        String logFilePath = "./log/log.log";
-        LogParser parser = new LogParser(logFilePath);
-
-        Map<String, List<String>> logsByLevel = parser.getLogsByLevel();
-
-        for (Map.Entry<String, List<String>> entry : logsByLevel.entrySet()) {
-            System.out.println("Log Level: " + entry.getKey());
-            for (String log : entry.getValue()) {
-                System.out.println("  - " + log);
-            }
+    private LocalDateTime extractTimestamp(String line, DateTimeFormatter formatter) {
+        try {
+            String timestamp = line.substring(0, 19);
+            return LocalDateTime.parse(timestamp, formatter);
+        } catch (Exception e) {
+            return null;
         }
     }
 }
