@@ -45,7 +45,7 @@ public class WriteFileNode extends InOutNode {
     }
 
     @Override
-    protected void onMessage(Message message) {
+    public void onMessage(Message message) {
 
         if (message == null) {
             log.error("메시지가 null입니다. NodeId: {}", getId());
