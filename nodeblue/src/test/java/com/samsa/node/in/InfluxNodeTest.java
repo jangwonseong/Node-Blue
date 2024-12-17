@@ -46,7 +46,7 @@ public class InfluxNodeTest {
             flowThread.start();
 
             // 테스트 데이터 전송
-            for (int i = 0; i < 5; i++) {
+            for (int i = 0; i < 100; i++) {
                 // 페이로드 데이터 생성
                 Map<String, Object> payload = new HashMap<>();
                 payload.put("voltage", 220.0 + i);

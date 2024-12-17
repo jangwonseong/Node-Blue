@@ -1,4 +1,5 @@
 {
-  "java.configuration.updateBuildConfiguration": "interactive",
-  "java.search.scope": "all"
+  "java.configuration.updateBuildConfiguration": "automatic",
+  "java.search.scope": "all",
+  "java.debug.settings.onBuildFailureProceed": true
 }
