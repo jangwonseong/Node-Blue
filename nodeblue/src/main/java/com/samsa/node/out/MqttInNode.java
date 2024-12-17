@@ -17,7 +17,7 @@ import lombok.extern.slf4j.Slf4j;
  * MQTT 입력 노드 클래스. MQTT 브로커로부터 메시지를 구독하고 처리합니다.
  */
 @Slf4j
-public class MqttInNode extends OutNode{
+public class MqttInNode extends OutNode {
     // mqtt를 in하고 자바 내에서 out 하는 노드
 
     private MqttClient mqttClient;
@@ -92,8 +92,11 @@ public class MqttInNode extends OutNode{
                     // Message message = new Message(new String(mqttMessage.getPayload()));
 
                     // createMessage 메서드로 byte 데이터 Message클래스 기반 데이터로 변환
-                    Message message = new Message(new String(mqttMessage.getPayload()));
+                    String payload = String.format("{topic: %s, %s}", topic,
+                            new String(mqttMessage.getPayload()));
+                    Message message = new Message(payload);
                     emit(message);
+
                 }
 
                 @Override
