@@ -5,6 +5,7 @@ import com.serotonin.modbus4j.ModbusFactory;
 import com.serotonin.modbus4j.ModbusMaster;
 import com.serotonin.modbus4j.exception.ModbusInitException;
 import com.serotonin.modbus4j.exception.ModbusTransportException;
+import com.serotonin.modbus4j.msg.ModbusRequest;
 import com.serotonin.modbus4j.msg.ReadHoldingRegistersResponse;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -32,7 +33,7 @@ class ModbusNodeTest {
         ReadHoldingRegistersResponse mockResponse = mock(ReadHoldingRegistersResponse.class);
         when(mockResponse.isException()).thenReturn(false);
         when(mockResponse.getShortData()).thenReturn(new short[] {1, 2});
-        when(mockMaster.send(any())).thenReturn(mockResponse);
+        when(mockMaster.send((ModbusRequest)any())).thenReturn(mockResponse);
 
         Message message = modbusNode.createMessage();
 
@@ -42,10 +43,10 @@ class ModbusNodeTest {
 
     @Test
     void testCreateMessageException() throws ModbusInitException, ModbusTransportException {
-        when(mockMaster.send(any())).thenThrow(new ModbusTransportException("Test Exception"));
+        when(mockMaster.send((ModbusRequest)any())).thenThrow(new ModbusTransportException("Test Exception"));
 
         Message message = modbusNode.createMessage();
 
         assertNull(message);
-    }
+    } 
 }
