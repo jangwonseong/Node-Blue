@@ -33,7 +33,7 @@ class ModbusNodeTest {
         ReadHoldingRegistersResponse mockResponse = mock(ReadHoldingRegistersResponse.class);
         when(mockResponse.isException()).thenReturn(false);
         when(mockResponse.getShortData()).thenReturn(new short[] {1, 2});
-        when(mockMaster.send((ModbusRequest)any())).thenReturn(mockResponse);
+        when(mockMaster.send((ModbusRequest) any())).thenReturn(mockResponse);
 
         Message message = modbusNode.createMessage();
 
@@ -43,10 +43,11 @@ class ModbusNodeTest {
 
     @Test
     void testCreateMessageException() throws ModbusInitException, ModbusTransportException {
-        when(mockMaster.send((ModbusRequest)any())).thenThrow(new ModbusTransportException("Test Exception"));
+        when(mockMaster.send((ModbusRequest) any()))
+                .thenThrow(new ModbusTransportException("Test Exception"));
 
         Message message = modbusNode.createMessage();
 
         assertNull(message);
-    } 
+    }
 }

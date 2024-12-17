@@ -17,7 +17,7 @@ import lombok.extern.slf4j.Slf4j;
  * MQTT 입력 노드 클래스. MQTT 브로커로부터 메시지를 구독하고 처리합니다.
  */
 @Slf4j
-public class MqttInNode extends OutNode{
+public class MqttInNode extends OutNode {
     // mqtt를 in하고 자바 내에서 out 하는 노드
 
     private MqttClient mqttClient;
@@ -25,8 +25,6 @@ public class MqttInNode extends OutNode{
     private String clientId;
     private String[] topics;
     private int[] qos;
-
-    private Message message;
 
     /**
      * 주어진 브로커 URL과 클라이언트 ID로 MqttInNode 객체를 생성합니다.
@@ -60,6 +58,15 @@ public class MqttInNode extends OutNode{
 
     @Override
     protected Message createMessage() {
+        // 메시지 생성 로직 구현
+        // 이 부분은 MQTT 메시지를 수신하여 Message 객체로 변환하는 로직을 작성해야 합니다.
+        // 실제 메시지 반환하도록 구현 필요
+
+        return null;
+    }
+
+    @Override
+    public void run() {
         try {
             mqttClient = new MqttClient(broker, clientId);
             mqttClient.connect();
@@ -85,7 +92,11 @@ public class MqttInNode extends OutNode{
                     // Message message = new Message(new String(mqttMessage.getPayload()));
 
                     // createMessage 메서드로 byte 데이터 Message클래스 기반 데이터로 변환
-                    message = new Message(new String(mqttMessage.getPayload()));
+                    String payload = String.format("{topic: %s, %s}", topic,
+                            new String(mqttMessage.getPayload()));
+                    Message message = new Message(payload);
+                    emit(message);
+
                 }
 
                 @Override
@@ -101,8 +112,6 @@ public class MqttInNode extends OutNode{
             log.error("MQTT 처리 중 오류 발생", e);
             Thread.currentThread().interrupt();
         }
-
-        return message;
     }
 
 }

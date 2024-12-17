@@ -15,12 +15,12 @@ public class MqttInNodeTest {
 
     @BeforeEach
     void setUp() {
-        String[] topics = {"application/#", "application/#"};
+        String[] topics = {"application/#", "applicatio"};
         mqttInNode = new MqttInNode("tcp://192.168.70.203:1883", "1235", topics); // 노드부터 만들었을 때
         Pipe pipe = new Pipe();
         mqttInNode.getPort().addPipe(pipe);
 
-        mqttOutNode = new MqttOutNode("tcp://192.168.70.203:1883", "4321", topics[0]);
+        mqttOutNode = new MqttOutNode("tcp://192.168.70.203:1883", "4321", topics[1]);
         mqttOutNode.getPort().addPipe(pipe);
     }
 
