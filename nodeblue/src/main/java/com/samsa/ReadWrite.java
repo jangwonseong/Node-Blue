@@ -13,9 +13,9 @@ import com.samsa.node.inout.WriteFileNode;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-public class Main {
+public class ReadWrite {
     public static void main(String[] args) {
-        Path filePath = Paths.get("./log/log.log").toAbsolutePath();
+        Path filePath = Paths.get("./log/log2.log").toAbsolutePath();
 
         WriteFileNode writer = new WriteFileNode(filePath, true);
         ReadFileNode reader = new ReadFileNode(filePath, true);
