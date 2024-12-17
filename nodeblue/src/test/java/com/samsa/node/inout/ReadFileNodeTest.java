@@ -63,6 +63,7 @@ class ReadFileNodeTest {
         
         Object payload = message.getPayload();
         assertTrue(payload instanceof List);
+        @SuppressWarnings("unchecked")
         List<String> lines = (List<String>) payload;
         assertFalse(lines.isEmpty());
     }

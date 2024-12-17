@@ -3,7 +3,6 @@ package com.samsa.node.inout;
 import com.samsa.core.Message;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 
