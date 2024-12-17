@@ -6,10 +6,21 @@ import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * 노드 간에 전달되는 메시지를 나타내는 클래스입니다. 각 메시지는 고유한 ID와 페이로드를 가지며, 노드 간 통신의 기본 단위가 됩니다.
+ * Message 클래스는 노드 간에 전달되는 메시지를 나타냅니다.
+ * 각 메시지는 고유한 ID, 페이로드, 그리고 메타데이터를 포함합니다.
  * 
+ * <p>
+ * 메시지는 노드 간 통신의 기본 단위이며, 다음과 같은 특징을 가집니다:
+ * </p>
+ * <ul>
+ * <li>고유한 UUID를 통한 메시지 식별</li>
+ * <li>임의의 타입의 페이로드 지원</li>
+ * <li>메타데이터를 통한 부가 정보 전달</li>
+ * <li>방어적 복사를 통한 메타데이터 보호</li>
+ * </ul>
+ *
  * @author samsa
- * @since 1.0
+ * @version 1.0
  */
 @Slf4j
 public class Message {
