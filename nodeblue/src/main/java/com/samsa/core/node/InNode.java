@@ -33,7 +33,7 @@ public abstract class InNode extends Node {
     public void run() {
         while (true) {
             try {
-                Message message = receive();
+                Message message = receive(); // 파이프에 있는 메세지를 꺼낸다.
                 onMessage(message);
                 Thread.sleep(1000);
             } catch (InterruptedException e) {
