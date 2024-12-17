@@ -62,11 +62,11 @@ public class MqttOutNode extends InNode{
             System.out.println("mqttClient create");
             mqttClient.connect(); // 지정된 브로커에 연결을 시도합니다.
 
-            while(true) {
+            // while(true) {
                 // 지정된 주제와 메시지를 MQTT 브로커에 발행합니다. 브로커로 토픽과 메시지(바이트로 변환)를 날림.
                 mqttClient.publish(topic, new MqttMessage(message.toString().getBytes()));
                 log.info("Message send!!");
-            }
+            // }
         }catch(Exception e){
             e.printStackTrace();
         }
