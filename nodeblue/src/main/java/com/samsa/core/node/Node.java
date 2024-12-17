@@ -6,7 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public abstract class Node implements Runnable {
-    enum NodeStatus {
+    public enum NodeStatus {
         CREATED, RUNNING, STOPPED, ERROR
     }
 
