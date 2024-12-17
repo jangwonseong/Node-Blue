@@ -46,7 +46,7 @@ public abstract class OutNode extends Node {
         while (true) {
             try {
                 Message message = createMessage(); // 메시지 생성 로직을 자식 클래스에 위임
-                log.info("메시지 출력!!! @@@ !!!!");
+                log.info("메시지 출력");
                 emit(message);
                 Thread.sleep(1000);
             } catch (InterruptedException e) {

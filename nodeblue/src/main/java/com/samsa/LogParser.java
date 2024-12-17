@@ -170,4 +170,47 @@ public class LogParser {
             return null;
         }
     }
+        public static void main(String[] args) {
+            LogParser parser = new LogParser("./log/log.log");
+            
+            // 1. Modbus 통신 상태 분석
+            System.out.println("=== Modbus 통신 상태 ===");
+            List<String> modbusLogs = parser.searchLogsByKeyword("Modbus");
+            for (String log : modbusLogs) {
+                System.out.println(log);
+            }
+    
+            // 2. 특정 메시지 ID의 흐름 추적
+            System.out.println("\n=== 메시지 흐름 추적 ===");
+            String targetMessageId = "26998b71-b27a-47d2-9f58-6095b8f4f773";
+            List<String> messageLogs = parser.searchLogsByKeyword(targetMessageId);
+            for (String log : messageLogs) {
+                System.out.println(log);
+            }
+    
+            // 3. 에러 로그 분석
+            System.out.println("\n=== 에러 로그 분석 ===");
+            List<String> errorLogs = parser.getLogsBySpecificLevel(LogLevel.ERROR);
+            for (String log : errorLogs) {
+                System.out.println(log);
+            }
+    
+            // 4. 특정 시간대 로그 분석
+            System.out.println("\n=== 특정 시간대 로그 분석 ===");
+            LocalDateTime start = LocalDateTime.of(2024, 12, 17, 15, 8, 32);
+            LocalDateTime end = LocalDateTime.of(2024, 12, 17, 15, 8, 35);
+            List<String> timeRangeLogs = parser.getLogsByTimeRange(start, end);
+            for (String log : timeRangeLogs) {
+                System.out.println(log);
+            }
+    
+            // 5. 노드 상태 변화 분석
+            System.out.println("\n=== 노드 상태 변화 ===");
+            List<String> nodeStatusLogs = parser.searchLogsByKeyword("노드 실행");
+            for (String log : nodeStatusLogs) {
+                System.out.println(log);
+        }
+    }
 }
+    
+
