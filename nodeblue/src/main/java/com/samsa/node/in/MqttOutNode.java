@@ -56,7 +56,7 @@ public class MqttOutNode extends InNode{
     @Override
     protected void onMessage(Message message) {
         // 브로커로 보낼 메시지를 가공하는 곳
-        log.info(message.getPayload().toString());
+        log.info(message.getPayload().toString() + "메시지 받음 !!!");
         try{
             mqttClient = new MqttClient(broker, clientId); // mqtt 클라이언트가 해당 브로커와 연결할 것이라고 알려줘야함.
             System.out.println("mqttClient create");
