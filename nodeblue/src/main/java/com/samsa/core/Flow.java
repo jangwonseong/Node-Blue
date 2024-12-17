@@ -20,6 +20,11 @@ public class Flow implements Runnable {
     /** 실행할 노드들의 목록 */
     private List<Node> nodes = new ArrayList<>();
 
+    
+    public List<Node> getNodes() {
+        return nodes;
+    }
+
     /**
      * Flow에 새로운 노드를 추가합니다.
      *
