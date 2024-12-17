@@ -30,7 +30,7 @@ public abstract class InOutNode extends Node {
         return inPort.consume();
     }
 
-    private void emit(Message message) {
+    protected void emit(Message message) {
         if (outPort == null) {
             log.error("출력 포트가 초기화되지 않았습니다. NodeId: {}", getId());
             throw new IllegalStateException("출력 포트가 초기화되지 않았습니다");
@@ -52,7 +52,7 @@ public abstract class InOutNode extends Node {
 
     protected void onMessage(Message message) {
         emit(message);
-    };
+    }
 
     @Override
     public void run() {
