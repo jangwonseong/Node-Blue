@@ -1,5 +1,8 @@
 package com.samsa.node.in;
 
+import java.util.Map;
+import java.util.UUID;
+
 import com.influxdb.client.InfluxDBClient;
 import com.influxdb.client.InfluxDBClientFactory;
 import com.influxdb.client.WriteApiBlocking;
@@ -7,35 +10,54 @@ import com.influxdb.client.domain.WritePrecision;
 import com.influxdb.client.write.Point;
 import com.samsa.core.Message;
 import com.samsa.core.node.InNode;
+
 import lombok.extern.slf4j.Slf4j;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
-
+/**
+ * InfluxNode는 메시지를 수신하고 데이터를 InfluxDB에 저장하는 역할을 합니다.
+ * 메시지를 처리하고, 관련 필드와 태그를 추출하여 InfluxDB에 저장합니다.
+ */
 @Slf4j
 public class InfluxNode extends InNode {
     private InfluxDBClient influxDBClient;
     private WriteApiBlocking writeApi;
-    private String measurement;
-    private List<String> tagKeys;
-    private List<String> fieldKeys;
 
+    /**
+     * 지정된 InfluxDB 연결 정보를 사용하여 InfluxNode를 생성합니다.
+     *
+     * @param url     InfluxDB 인스턴스의 URL
+     * @param token   InfluxDB 인증 토큰
+     * @param org     InfluxDB의 조직 이름
+     * @param bucket  InfluxDB의 버킷 이름
+     */
     public InfluxNode(String url, String token, String org, String bucket) {
         super();
         initialize(url, token, org, bucket);
     }
 
+    /**
+     * 지정된 ID와 InfluxDB 연결 정보를 사용하여 InfluxNode를 생성합니다.
+     *
+     * @param id      이 노드의 고유 식별자
+     * @param url     InfluxDB 인스턴스의 URL
+     * @param token   InfluxDB 인증 토큰
+     * @param org     InfluxDB의 조직 이름
+     * @param bucket  InfluxDB의 버킷 이름
+     */
     public InfluxNode(UUID id, String url, String token, String org, String bucket) {
         super(id);
         initialize(url, token, org, bucket);
     }
 
+    /**
+     * 지정된 InfluxDB 연결 정보를 사용하여 InfluxNode를 초기화합니다.
+     *
+     * @param url     InfluxDB 인스턴스의 URL
+     * @param token   InfluxDB 인증 토큰
+     * @param org     InfluxDB의 조직 이름
+     * @param bucket  InfluxDB의 버킷 이름
+     */
     private void initialize(String url, String token, String org, String bucket) {
-        this.tagKeys = new ArrayList<>();
-        this.fieldKeys = new ArrayList<>();
-
         try {
             // InfluxDB 클라이언트 생성
             this.influxDBClient = InfluxDBClientFactory.create(url,
@@ -47,113 +69,106 @@ public class InfluxNode extends InNode {
             // 연결 테스트
             try {
                 influxDBClient.ping();
-                log.info("Successfully connected to InfluxDB: {}", url);
+                log.info("성공적으로 InfluxDB에 연결되었습니다: {}", url);
             } catch (Exception e) {
-                log.error("Failed to connect to InfluxDB: {}", e.getMessage());
-                throw new IllegalStateException("Failed to connect to InfluxDB", e);
+                log.error("InfluxDB에 연결하지 못했습니다: {}", e.getMessage());
+                throw new IllegalStateException("InfluxDB에 연결하지 못했습니다", e);
             }
 
         } catch (Exception e) {
-            log.error("Error initializing InfluxNode: {}", e.getMessage());
-            throw new IllegalStateException("Error initializing InfluxNode", e);
+            log.error("InfluxNode 초기화 중 오류 발생: {}", e.getMessage());
+            throw new IllegalStateException("InfluxNode 초기화 중 오류 발생", e);
         }
     }
 
-    public void setMeasurement(String measurement) {
-        if (measurement == null || measurement.trim().isEmpty()) {
-            throw new IllegalArgumentException("Measurement name cannot be empty");
-        }
-        this.measurement = measurement.trim();
-        log.debug("Measurement set to: {}", this.measurement);
-    }
-
-    public void addTagKey(String tagKey) {
-        if (tagKey != null && !tagKey.trim().isEmpty()) {
-            this.tagKeys.add(tagKey.trim());
-            log.debug("Added tag key: {}", tagKey.trim());
-        }
-    }
-
-    public void addFieldKey(String fieldKey) {
-        if (fieldKey != null && !fieldKey.trim().isEmpty()) {
-            this.fieldKeys.add(fieldKey.trim());
-            log.debug("Added field key: {}", fieldKey.trim());
-        }
-    }
-
+    /**
+     * 메시지를 수신하고 InfluxDB에 데이터를 저장합니다.
+     *
+     * @param message 수신된 메시지
+     */
     @Override
     protected void onMessage(Message message) {
         try {
             if (message == null) {
-                log.warn("Node[{}] - Received null message", getId());
+                log.warn("Node[{}] - null 메시지를 수신했습니다", getId());
                 return;
             }
 
-            if (measurement == null) {
-                log.error("Node[{}] - Measurement name not set", getId());
-                return;
-            }
+            log.debug("Node[{}] - 메시지를 수신했습니다: {}", getId(), message);
 
             Point point = createPoint(message);
             if (point != null) {
                 writeApi.writePoint(point);
-                log.debug("Node[{}] - Successfully wrote point to InfluxDB. MessageId: {}",
+                log.debug("Node[{}] - InfluxDB에 포인트를 성공적으로 기록했습니다. MessageId: {}",
                         getId(), message.getId());
+            } else {
+                log.warn("Node[{}] - 포인트 생성이 null을 반환했습니다. MessageId: {}", getId(), message.getId());
             }
 
         } catch (Exception e) {
-            log.error("Node[{}] - Error writing to InfluxDB: {}", getId(), e.getMessage());
+            log.error("Node[{}] - InfluxDB에 기록 중 오류 발생: {}", getId(), e.getMessage());
         }
     }
 
+    /**
+     * 메시지에서 포인트를 생성합니다.
+     *
+     * @param message 수신된 메시지
+     * @return 생성된 포인트 객체
+     */
     private Point createPoint(Message message) {
         try {
-            Object payloadObj = message.getPayload();
+          Object payloadObj = message.getPayload();
             if (!(payloadObj instanceof Map)) {
-                log.warn("Node[{}] - Payload is not a Map. MessageId: {}", getId(), message.getId());
+                log.warn("Node[{}] - 페이로드가 Map이 아닙니다. MessageId: {}", getId(), message.getId());
                 return null;
             }
 
             @SuppressWarnings("unchecked")
             Map<String, Object> payload = (Map<String, Object>) payloadObj;
-            Map<String, Object> metadata = message.getMetadata();
+
+            String measurement = (String) payload.get("measurement");
+            Map<String, String> tags = (Map<String, String>) payload.get("tags");
+            Object field = payload.get("field");
+            long time = (long) payload.get("time");
+
+            log.debug("Node[{}] - 페이로드: {}로 포인트를 생성합니다", getId(), payload);
 
             Point point = Point.measurement(measurement)
-                    .time(System.currentTimeMillis(), WritePrecision.MS);
+                    .time(time, WritePrecision.MS);
 
             // 태그 추가
-            for (String tagKey : tagKeys) {
-                if (metadata.containsKey(tagKey)) {
-                    point.addTag(tagKey, String.valueOf(metadata.get(tagKey)));
-                }
+            for (Map.Entry<String, String> tag : tags.entrySet()) {
+                point.addTag(tag.getKey(), tag.getValue());
+                log.debug("Node[{}] - 태그 추가: {} = {}", getId(), tag.getKey(), tag.getValue());
             }
 
             // 필드 추가
-            boolean hasValidField = false;
-            for (String fieldKey : fieldKeys) {
-                if (payload.containsKey(fieldKey)) {
-                    Object value = payload.get(fieldKey);
-                    if (value instanceof Number) {
-                        point.addField(fieldKey, (Number) value);
-                        hasValidField = true;
-                    } else if (value instanceof Boolean) {
-                        point.addField(fieldKey, (Boolean) value);
-                        hasValidField = true;
-                    } else if (value instanceof String) {
-                        point.addField(fieldKey, (String) value);
-                        hasValidField = true;
-                    }
-                }
+            if (field instanceof Number) {
+                point.addField("field", (Number) field);
+                log.debug("Node[{}] - 필드 추가: field = {}", getId(), field);
+            } else if (field instanceof Boolean) {
+                point.addField("field", (Boolean) field);
+                log.debug("Node[{}] - 필드 추가: field = {}", getId(), field);
+            } else if (field instanceof String) {
+                point.addField("field", (String) field);
+                log.debug("Node[{}] - 필드 추가: field = {}", getId(), field);
+            } else {
+                log.warn("Node[{}] - 유효한 필드가 없습니다. MessageId: {}", getId(), message.getId());
+                return null;
             }
 
-            return hasValidField ? point : null;
+            return point;
 
         } catch (Exception e) {
-            log.error("Node[{}] - Error creating point: {}", getId(), e.getMessage());
+            log.error("Node[{}] - 포인트 생성 중 오류 발생: {}", getId(), e.getMessage());
             return null;
         }
     }
 
+    /**
+     * InfluxDB 클라이언트를 닫습니다.
+     */
     public void close() {
         try {
             if (writeApi != null) {
@@ -161,10 +176,10 @@ public class InfluxNode extends InNode {
             }
             if (influxDBClient != null) {
                 influxDBClient.close();
-                log.info("Node[{}] - Closed InfluxDB connection", getId());
+                log.info("Node[{}] - InfluxDB 연결을 닫았습니다", getId());
             }
         } catch (Exception e) {
-            log.error("Node[{}] - Error closing InfluxDB client: {}", getId(), e.getMessage());
+            log.error("Node[{}] - InfluxDB 클라이언트 닫기 중 오류 발생: {}", getId(), e.getMessage());
         }
     }
 }
