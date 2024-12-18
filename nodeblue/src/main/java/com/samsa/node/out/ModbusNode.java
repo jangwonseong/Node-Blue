@@ -130,7 +130,7 @@ public class ModbusNode extends OutNode {
             metadata.put("slaveId", slaveId);
             
             // short[]로 직접 전달
-            return new Message(response.getShortData(), metadata);
+            return new Message(response.getShortData());
         } catch (ModbusTransportException e) {
             log.error("Modbus 전송 오류 발생: {}", e.getMessage(), e);
             return null;

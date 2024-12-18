@@ -44,7 +44,6 @@ public class ModbusFlowMain {
         DebugNode debugNode = new DebugNode();
 
         debugNode.setLogLevel("DEBUG"); // 디버그 레벨 설정
-        debugNode.setIncludeMetadata(true); // 메타데이터 포함
 
         // 3. 파이프 생성
         Pipe delayToDebug = new Pipe();
