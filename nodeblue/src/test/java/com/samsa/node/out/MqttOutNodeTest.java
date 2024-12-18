@@ -1,4 +1,4 @@
-package com.samsa;
+package com.samsa.node.out;
 
 public class MqttOutNodeTest {
     

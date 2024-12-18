@@ -1,12 +1,17 @@
 package com.samsa.node.inout;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.samsa.core.Message;
 import com.samsa.core.node.InOutNode;
+import com.samsa.annotation.NodeType;
 import lombok.extern.slf4j.Slf4j;
+
+
 
 /**
  * {@code FunctionNode} 클래스는 사용자 정의 로직을 처리할 수 있도록 함수형 인터페이스 기반 메시지 핸들러를 제공하는 노드입니다.
  */
+@NodeType("FunctionNode")
 @Slf4j
 public class FunctionNode extends InOutNode {
 
@@ -26,13 +31,26 @@ public class FunctionNode extends InOutNode {
     private final MessageHandler messageHandler;
 
     /**
+     * Jackson 역직렬화를 위한 기본 생성자
+     */
+    @JsonCreator
+    public FunctionNode() {
+        super();
+        this.messageHandler = message -> {
+            log.info("기본 메시지 핸들러: {}", message.getPayload());
+        };
+    }
+
+    /**
+     * 커스텀 메시지 핸들러를 사용하는 생성자
      * 새로운 {@code FunctionNode} 인스턴스를 생성합니다.
      *
      * @param messageHandler 메시지를 처리할 사용자 정의 핸들러
      */
     public FunctionNode(MessageHandler messageHandler) {
         super();
-        this.messageHandler = messageHandler;
+        this.messageHandler = messageHandler != null ? messageHandler : 
+            message -> log.info("기본 메시지 핸들러: {}", message.getPayload());
     }
 
     /**
@@ -42,6 +60,10 @@ public class FunctionNode extends InOutNode {
      */
     @Override
     protected void onMessage(Message message) {
+        if (message == null) {
+            log.warn("Null 메시지를 받았습니다");
+            return;
+        }
         try {
             log.info("메시지 ID: {} - 처리 시작", message.getId());
             messageHandler.handle(message); // 함수형 인터페이스 호출

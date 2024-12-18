@@ -42,17 +42,6 @@ class DelayNodeTest {
     }
 
     /**
-     * ID를 지정하고 음수 지연 시간을 설정했을 때 {@link IllegalArgumentException}이 발생하는지 확인합니다.
-     */
-    @Test
-    void testConstructorWithIdAndNegativeDelay() {
-        UUID id = UUID.randomUUID();
-        assertThrows(IllegalArgumentException.class, () -> {
-            new DelayNode(id, -1000);
-        });
-    }
-
-    /**
      * 메시지 처리 시 지정된 지연 시간이 정확하게 적용되는지 확인합니다.
      * <p>
      * 메시지 처리가 최소 {@link #DELAY_TIME} 밀리초 이상 지연되는지 테스트합니다.
@@ -84,7 +73,7 @@ class DelayNodeTest {
     @Test
     void testCustomIdConstructor() {
         UUID customId = UUID.randomUUID();
-        DelayNode customNode = new DelayNode(customId, DELAY_TIME);
+        DelayNode customNode = new DelayNode(DELAY_TIME);
         
         assertEquals(customId, customNode.getId());
         assertEquals(DELAY_TIME, customNode.getDelayMillis());

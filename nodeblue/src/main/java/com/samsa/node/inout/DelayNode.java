@@ -3,8 +3,11 @@ package com.samsa.node.inout;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.samsa.core.Message;
 import com.samsa.core.node.InOutNode;
+import com.samsa.annotation.NodeType;
 
 import lombok.extern.slf4j.Slf4j;
 /**
@@ -16,42 +19,36 @@ import lombok.extern.slf4j.Slf4j;
  * <p>이 클래스는 주로 메시지 처리 타이밍을 제어해야 하는 시스템에서 사용됩니다.
  * 예를 들어, 시뮬레이션 또는 처리 속도가 제한된 메시지 파이프라인에서 활용됩니다.</p>
  */
+@NodeType("DelayNode")
 @Slf4j
 public class DelayNode extends InOutNode {
-
-    /**
-     * 밀리초 단위의 지연 시간.
-     * 0 이상의 값이어야 합니다.
-     */
     private final long delayMillis;
 
     /**
-     * 지연 시간을 설정하여 {@code DelayNode}를 생성합니다.
-     * 노드에 무작위 UUID가 할당됩니다.
-     *
-     * @param delayMillis 지연 시간(밀리초 단위); 0 이상의 값이어야 합니다.
-     * @throws IllegalArgumentException {@code delayMillis}가 음수인 경우 예외가 발생합니다.
+     * Jackson 역직렬화를 위한 생성자
      */
-    public DelayNode(long delayMillis) {
-        this(UUID.randomUUID(), delayMillis);
+    @JsonCreator
+    public DelayNode(@JsonProperty("delay") long delayMillis) {
+        super();
+        validateDelay(delayMillis);
+        this.delayMillis = delayMillis;
     }
 
     /**
-     * 지정된 UUID와 지연 시간을 사용하여 {@code DelayNode}를 생성합니다.
-     *
-     * @param id          노드의 고유 식별자(UUID).
-     * @param delayMillis 지연 시간(밀리초 단위); 0 이상의 값이어야 합니다.
-     * @throws IllegalArgumentException {@code delayMillis}가 음수인 경우 예외가 발생합니다.
+     * 지정된 UUID와 지연 시간을 사용하여 DelayNode를 생성합니다.
      */
     public DelayNode(UUID id, long delayMillis) {
         super(id);
+        validateDelay(delayMillis);
+        this.delayMillis = delayMillis;
+    }
+
+    private void validateDelay(long delayMillis) {
         if (delayMillis < 0) {
             log.error("지연 시간이 음수입니다: {} ms", delayMillis);
             throw new IllegalArgumentException("지연 시간은 음수일 수 없습니다");
         }
-        this.delayMillis = delayMillis;
     }
-
     /**
      * 메시지를 처리할 때 지연을 추가합니다. 이 메소드는 메시지를 부모 노드의 {@code onMessage} 메소드로 전달하기 전에
      * 설정된 지연 시간을 적용합니다.

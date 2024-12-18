@@ -3,6 +3,7 @@ package com.samsa.node.in;
 import java.util.UUID;
 import com.samsa.core.Message;
 import com.samsa.core.node.InNode;
+import com.samsa.annotation.NodeType;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -16,6 +17,7 @@ import lombok.extern.slf4j.Slf4j;
  * @author samsa
  * @version 1.0
  */
+@NodeType("DebugNode")
 @Slf4j
 public class DebugNode extends InNode {
     private String logLevel = "INFO";
