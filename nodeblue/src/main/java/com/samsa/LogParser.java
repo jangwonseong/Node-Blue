@@ -12,10 +12,8 @@ import java.util.Map;
  * LogParser 클래스는 로그 파일을 파싱하여 로그 레벨별로 메시지를 분류하는 기능을 제공합니다.
  * 지원하는 로그 레벨은 DEBUG, INFO, WARN, ERROR입니다.
  * 
- * <p>
  * 이 클래스는 로그 파일을 읽어서 각 로그 레벨별로 메시지를 분류하고,
  * 분류된 결과를 맵 형태로 제공합니다.
- * </p>
  *
  * @author samsa
  * @version 1.0

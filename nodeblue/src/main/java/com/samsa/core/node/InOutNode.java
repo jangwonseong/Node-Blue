@@ -69,9 +69,6 @@ public abstract class InOutNode extends Node {
 
                 log.info("노드 실행 완료. NodeId: {}", getId());
 
-                Thread.sleep(1000);
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
             } catch (Exception e) {
                 log.error("노드 실행 중 오류 발생. NodeId: {}", getId(), e);
             }
