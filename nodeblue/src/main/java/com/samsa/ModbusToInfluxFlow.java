@@ -43,6 +43,7 @@ public class ModbusToInfluxFlow {
 
         // topic 파싱
         String[] topicParts = topic.split("/");
+        String location = topicParts[1];
         String measureType = topicParts[2];
 
         // JSON 파싱
@@ -67,7 +68,8 @@ public class ModbusToInfluxFlow {
         Map<String, String> tags = new HashMap<>();
         Map<String, Object> fields = new HashMap<>();
 
-        // power 데이터 구성;
+        // power 데이터 구성
+        tags.put("location", location);
         fields.put(measureType, value);  // V1, W 등을 필드명으로 사용
         
         newPayload.put("measurement", "power");
