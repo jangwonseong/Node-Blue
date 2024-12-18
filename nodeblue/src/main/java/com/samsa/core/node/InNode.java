@@ -1,8 +1,10 @@
 package com.samsa.core.node;
 
 import java.util.UUID;
+
 import com.samsa.core.Message;
 import com.samsa.core.port.InPort;
+
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -35,9 +37,6 @@ public abstract class InNode extends Node {
             try {
                 Message message = receive(); // 파이프에 있는 메세지를 꺼낸다.
                 onMessage(message);
-                Thread.sleep(1000);
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
             } catch (Exception e) {
                 log.error("run 실행 중 오류 발생. NodeId: {}", getId(), e);
             }

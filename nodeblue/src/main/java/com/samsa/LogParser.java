@@ -12,6 +12,8 @@ import java.util.Map;
 
 import lombok.extern.slf4j.Slf4j;
 
+import lombok.extern.slf4j.Slf4j;
+
 /**
  * 로그 파일을 파싱하고 분석하는 기능을 제공하는 클래스입니다.
  * 다양한 필터링 옵션과 검색 기능을 지원합니다.
