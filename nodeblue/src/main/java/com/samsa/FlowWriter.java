@@ -14,7 +14,6 @@ public class FlowWriter {
         try {
             ObjectMapper mapper = new ObjectMapper();
             ObjectNode root = mapper.createObjectNode();
-            filePath = "/home/nhnacademy/Desktop/Samsa/Node-Blue/nodeblue/src/main/resources";
             
             var nodesArray = root.putArray("nodes");
             for (Node node : flow.getNodes()) {
