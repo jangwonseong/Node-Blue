@@ -13,6 +13,7 @@ import com.samsa.core.port.OutPort;
 import com.samsa.node.in.DebugNode;
 import com.samsa.node.inout.DelayNode;
 import com.samsa.node.inout.FunctionNode;
+import com.samsa.node.out.ModbusNode;
 import com.samsa.node.out.MqttInNode;
 
 import lombok.extern.slf4j.Slf4j;
@@ -29,6 +30,7 @@ public class FlowLoader {
 
     public enum NodeType {
         MQTT_IN("MqttInNode"),
+        MODBUS("ModbusNode"),
         DELAY("DelayNode"),
         DEBUG("DebugNode"),
         FUNCTION("FunctionNode");
@@ -111,6 +113,14 @@ public class FlowLoader {
                     properties.get("clientId").asText(),
                     mapper.convertValue(properties.get("topics"), String[].class)
             );
+            case MODBUS -> new ModbusNode(
+                properties.get("host").asText(),
+                properties.get("port").asInt(),
+                properties.get("slaveId").asInt(),
+                properties.get("startOffset").asInt(),
+                properties.get("numOfRegisters").asInt()
+            );
+
             case DELAY -> new DelayNode(properties.get("delay").asInt());
             case DEBUG -> new DebugNode();
             case FUNCTION -> new FunctionNode(message -> 
