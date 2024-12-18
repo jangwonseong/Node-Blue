@@ -29,15 +29,13 @@ public class MqttInNode extends OutNode {
     private String clientId;
     private String[] topics;
     private int[] qos;
-    
+
     /**
      * Jackson 역직렬화를 위한 생성자
      */
     @JsonCreator
-    public MqttInNode(
-            @JsonProperty("broker") String broker,
-            @JsonProperty("clientId") String clientId,
-            @JsonProperty("topics") String[] topics) {
+    public MqttInNode(@JsonProperty("broker") String broker,
+            @JsonProperty("clientId") String clientId, @JsonProperty("topics") String[] topics) {
         super();
         if (Objects.isNull(broker) || Objects.isNull(clientId)) {
             throw new NullPointerException("브로커와 클라이언트 ID는 null일 수 없습니다.");
@@ -47,6 +45,7 @@ public class MqttInNode extends OutNode {
         this.topics = topics;
         this.qos = new int[topics.length];
     }
+
 
     @Override
     protected Message createMessage() {
@@ -65,7 +64,7 @@ public class MqttInNode extends OutNode {
     private void handleConnectionLost(MqttClient client, MqttConnectOptions options,
             Throwable cause, String[] topics, int[] qos) {
         log.trace("연결이 끊어졌습니다: {}", cause.getMessage());
-        
+
         while (!client.isConnected()) {
             try {
                 log.info("재연결 시도 중...");
@@ -95,9 +94,9 @@ public class MqttInNode extends OutNode {
             connectOptions.setAutomaticReconnect(true);
             connectOptions.setCleanSession(true);
             connectOptions.setConnectionTimeout(10);
-            
+
             mqttClient.connect(connectOptions);
-            
+
             for (String topic : topics) {
                 mqttClient.subscribe(topic);
                 log.info("토픽 '{}'을 구독했습니다.", topic);
