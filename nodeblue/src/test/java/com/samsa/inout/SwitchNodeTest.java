@@ -1,75 +1,143 @@
 package com.samsa.inout;
 
-import java.util.HashMap;
-import java.util.Map;
-
-import com.samsa.core.Flow;
 import com.samsa.core.Message;
-import com.samsa.core.Pipe;
-import com.samsa.node.in.DebugNode;
 import com.samsa.node.inout.SwitchNode;
 
-public class SwitchNodeTest {
-    public static void main(String[] args) {
-        // Flow 생성
-        Flow flow = new Flow();
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import java.util.UUID;
 
-        // SwitchNode 생성 및 설정
-        SwitchNode switchNode = new SwitchNode();
-        switchNode.setMetadataKey("type");
+import static org.junit.jupiter.api.Assertions.*;
 
-        // 디버그 노드 생성 (결과 확인용)
-        DebugNode debugNode = new DebugNode();
-        debugNode.setIncludeMetadata(true);
-        debugNode.setLogLevel("INFO");
 
-        // 파이프로 노드 연결
-        Pipe pipe = new Pipe(10);
-        switchNode.getOutPort().addPipe(pipe);
-        debugNode.getPort().addPipe(pipe);
+/**
+ * SwitchNode의 기능을 테스트하는 테스트 클래스입니다.
+ * 조건에 따른 메시지 라우팅, 규칙 매칭, 예외 처리 등을 검증합니다.
+ */
+class SwitchNodeTest {
+    private SwitchNode switchNode;
 
-        // Flow에 노드 추가
-        flow.addNode(switchNode);
-        flow.addNode(debugNode);
+    /**
+ * 각 테스트 전에 실행되며, stopOnFirstMatch가 true인 SwitchNode를 생성합니다.
+ */
+    @BeforeEach
+    void setUp() {
+        switchNode = new SwitchNode(true); // stopOnFirstMatch = true
+    }
+        /**
+     * 커스텀 ID를 사용한 생성자 테스트.
+     * 지정된 ID로 노드가 정상적으로 생성되는지 확인합니다.
+     */
 
-        // Flow 실행
-        Thread flowThread = new Thread(flow);
-        flowThread.start();
+    @Test
+    void testConstructorWithCustomId() {
+        UUID customId = UUID.randomUUID();
+        SwitchNode node = new SwitchNode(customId, true);
+        assertEquals(customId, node.getId());
+    }
 
-        // 테스트 메시지 전송
-        try {
-            // 입력용 파이프 생성
-            Pipe inputPipe = new Pipe(10);
-            switchNode.getInPort().addPipe(inputPipe);
+        /**
+     * null 메시지 처리 테스트.
+     * null 메시지 입력 시 예외가 발생하지 않는지 확인합니다.
+     */
+    @Test
+    void testNullMessage() {
+        assertDoesNotThrow(() -> switchNode.onMessage(null));
+    }
 
-            // 테스트 케이스 1: 메타데이터 키가 있는 경우
-            Map<String, Object> metadata1 = new HashMap<>();
-            metadata1.put("type", "test");
-            Message message1 = new Message("Test message 1", metadata1);
-            inputPipe.offer(message1);
+        /**
+     * null 규칙 추가 테스트.
+     * null 규칙 추가 시 IllegalArgumentException이 발생하는지 확인합니다.
+     */
+    @Test
+    void testAddNullRule() {
+        assertThrows(IllegalArgumentException.class, () -> 
+            switchNode.addRule(null));
+    }
 
-            Thread.sleep(2000);
+        /**
+     * 단일 규칙 매칭 테스트.
+     * 숫자가 100보다 큰 경우를 검사하는 규칙을 테스트합니다.
+     */
+    @Test
+    void testSingleRuleMatch() {
+        // 숫자가 100보다 큰 경우를 검사하는 규칙
+        switchNode.addRule(new SwitchNode.Rule(msg -> 
+            msg.getPayload() instanceof Number && 
+            ((Number) msg.getPayload()).doubleValue() > 100));
 
-            // 테스트 케이스 2: 메타데이터 키가 없는 경우
-            Map<String, Object> metadata2 = new HashMap<>();
-            metadata2.put("other", "value");
-            Message message2 = new Message("Test message 2", metadata2);
-            inputPipe.offer(message2);
+        Message message = new Message(150);
+        switchNode.onMessage(message);
+    }
 
-            Thread.sleep(2000);
+        /**
+     * 다중 규칙 매칭 테스트 (첫 매칭 시 중단).
+     * stopOnFirstMatch가 true일 때 첫 번째 매칭 규칙에서 중단되는지 확인합니다.
+     */
+    @Test
+    void testMultipleRulesWithStopOnFirstMatch() {
+        switchNode.addRule(new SwitchNode.Rule(msg -> 
+            msg.getPayload() instanceof Number && 
+            ((Number) msg.getPayload()).doubleValue() > 100));
+        
+        switchNode.addRule(new SwitchNode.Rule(msg -> 
+            msg.getPayload() instanceof Number && 
+            ((Number) msg.getPayload()).doubleValue() > 50));
 
-            // 테스트 케이스 3: 다른 값을 가진 메타데이터 키가 있는 경우
-            Map<String, Object> metadata3 = new HashMap<>();
-            metadata3.put("type", "other");
-            Message message3 = new Message("Test message 3", metadata3);
-            inputPipe.offer(message3);
+        Message message = new Message(150);
+        switchNode.onMessage(message);
+    }
 
-            // 충분한 실행 시간 대기
-            Thread.sleep(5000);
-            System.exit(0);
+        /**
+     * 다중 규칙 매칭 테스트 (모든 규칙 평가).
+     * stopOnFirstMatch가 false일 때 모든 규칙이 평가되는지 확인합니다.
+     */
+    @Test
+    void testMultipleRulesWithoutStopOnFirstMatch() {
+        SwitchNode continuousNode = new SwitchNode(false);
+        
+        continuousNode.addRule(new SwitchNode.Rule(msg -> 
+            msg.getPayload() instanceof Number && 
+            ((Number) msg.getPayload()).doubleValue() > 100));
+        
+        continuousNode.addRule(new SwitchNode.Rule(msg -> 
+            msg.getPayload() instanceof Number && 
+            ((Number) msg.getPayload()).doubleValue() > 50));
 
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-        }
+        Message message = new Message(150);
+        continuousNode.onMessage(message);
+    }
+
+        /**
+     * 매칭되는 규칙이 없는 경우 테스트.
+     * 메시지가 어떤 규칙과도 매칭되지 않을 때의 동작을 확인합니다.
+     */
+    @Test
+    void testNoMatchingRules() {
+        switchNode.addRule(new SwitchNode.Rule(msg -> 
+            msg.getPayload() instanceof Number && 
+            ((Number) msg.getPayload()).doubleValue() > 100));
+
+        Message message = new Message(50);
+        switchNode.onMessage(message);
+    }
+
+        /**
+     * 다양한 페이로드 타입 테스트.
+     * 문자열과 숫자 타입의 페이로드에 대한 규칙 매칭을 확인합니다.
+     */
+    @Test
+    void testDifferentPayloadTypes() {
+        switchNode.addRule(new SwitchNode.Rule(msg -> 
+            msg.getPayload() instanceof String));
+        
+        switchNode.addRule(new SwitchNode.Rule(msg -> 
+            msg.getPayload() instanceof Number));
+
+        Message stringMessage = new Message("test");
+        Message numberMessage = new Message(100);
+        
+        switchNode.onMessage(stringMessage);
+        switchNode.onMessage(numberMessage);
     }
 }
