@@ -45,8 +45,9 @@ public class MqttToMysqlFlow {
 
             message.setPayload(columnMap);
         });
-        MySqlNode mySqlNode = new MySqlNode("com.mysql.cj.jdbc.Driver",
-                "jdbc:mysql://192.168.71.213:3306/IOT", "root", "P@ssw0rd", "INSERT INTO mqtt_data (");
+        MySqlNode mySqlNode =
+                new MySqlNode("com.mysql.cj.jdbc.Driver", "jdbc:mysql://192.168.71.213:3306/IOT",
+                        "root", "P@ssw0rd", "INSERT INTO mqtt_data (");
 
         Pipe mqttInToFunction = new Pipe();
         Pipe functionToDebug = new Pipe();
