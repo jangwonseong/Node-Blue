@@ -1,5 +1,8 @@
 package com.samsa.node.out;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import com.samsa.core.Message;
 import com.samsa.core.node.OutNode;
 import com.serotonin.modbus4j.ModbusFactory;
@@ -115,13 +118,19 @@ public class ModbusNode extends OutNode {
             // Modbus 응답 처리
             ReadHoldingRegistersResponse response = (ReadHoldingRegistersResponse) master.send(request);
 
+
             if (response == null || response.isException()) {
                 log.error("Modbus 응답에 오류가 있습니다. 예외 코드: {}", response.getExceptionCode());
                 return null;
             }
 
             log.info("Modbus에서 {}개의 레지스터를 성공적으로 읽어왔습니다.", numOfRegisters);
-            return new Message(response.getShortData()[0]);
+            
+            Map<String, Object> metadata = new HashMap<>();
+            metadata.put("slaveId", slaveId);
+            
+            // short[]로 직접 전달
+            return new Message(response.getShortData(), metadata);
         } catch (ModbusTransportException e) {
             log.error("Modbus 전송 오류 발생: {}", e.getMessage(), e);
             return null;

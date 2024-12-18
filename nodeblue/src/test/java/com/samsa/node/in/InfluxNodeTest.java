@@ -26,14 +26,6 @@ public class InfluxNodeTest {
                     INFLUX_ORG,
                     INFLUX_BUCKET);
 
-            // measurement, tag, field 설정
-            influxNode.setMeasurement("power");
-            influxNode.addTagKey("location"); // 메타데이터의 location을 태그로 사용
-            influxNode.addTagKey("deviceId"); // 메타데이터의 deviceId를 태그로 사용
-            influxNode.addFieldKey("voltage"); // 페이로드의 voltage를 필드로 사용
-            influxNode.addFieldKey("current"); // 페이로드의 current를 필드로 사용
-            influxNode.addFieldKey("power"); // 페이로드의 power를 필드로 사용
-
             // Flow에 노드 추가
             Flow flow = new Flow();
             flow.addNode(influxNode);
