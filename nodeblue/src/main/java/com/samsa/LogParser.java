@@ -174,48 +174,57 @@ public class LogParser {
         LogParser parser = new LogParser("./log/log.log");
     
         // 1. Modbus 통신 상태 분석
-        System.out.println("=== Modbus 통신 상태 ===");
+        log.info("=== Modbus 통신 상태 ===");
         List<String> modbusLogs = parser.searchLogsByKeyword("Modbus");
-        for (String log : modbusLogs) {
-            System.out.println(log);
-        }
+        modbusLogs.forEach(log::info);
     
         // 2. MQTT 통신 상태 분석
-        System.out.println("\n=== MQTT 통신 상태 ===");
+        log.info("\n=== MQTT 통신 상태 ===");
         List<String> mqttLogs = parser.searchLogsByKeyword("MQTT");
-        for (String log : mqttLogs) {
-            System.out.println(log);
-        }
+        mqttLogs.forEach(log::info);
     
         // 3. 특정 메시지 ID의 흐름 추적
-        System.out.println("\n=== 메시지 흐름 추적 ===");
+        log.info("\n=== 메시지 흐름 추적 ===");
         String targetMessageId = "26998b71-b27a-47d2-9f58-6095b8f4f773";
         List<String> messageLogs = parser.searchLogsByKeyword(targetMessageId);
-        for (String log : messageLogs) {
-            System.out.println(log);
-        }
+        messageLogs.forEach(log::info);
     
         // 4. 에러 로그 분석
-        System.out.println("\n=== 에러 로그 분석 ===");
+        log.info("\n=== 에러 로그 분석 ===");
         List<String> errorLogs = parser.getLogsBySpecificLevel(LogLevel.ERROR);
-        for (String log : errorLogs) {
-            System.out.println(log);
-        }
+        errorLogs.forEach(log::error);
     
         // 5. 특정 시간대 로그 분석
-        System.out.println("\n=== 특정 시간대 로그 분석 ===");
+        log.info("\n=== 특정 시간대 로그 분석 ===");
         LocalDateTime start = LocalDateTime.of(2024, 12, 17, 15, 8, 32);
         LocalDateTime end = LocalDateTime.of(2024, 12, 17, 15, 8, 35);
         List<String> timeRangeLogs = parser.getLogsByTimeRange(start, end);
-        for (String log : timeRangeLogs) {
-            System.out.println(log);
-        }
+        timeRangeLogs.forEach(log::info);
     
         // 6. 노드 상태 변화 분석
-        System.out.println("\n=== 노드 상태 변화 ===");
+        log.info("\n=== 노드 상태 변화 ===");
         List<String> nodeStatusLogs = parser.searchLogsByKeyword("노드 실행");
-        for (String log : nodeStatusLogs) {
-            System.out.println(log);
+        nodeStatusLogs.forEach(log::info);
+
+        // 7. 로그 분석 요약 출력
+        summarizeLogAnalysis(parser);
+    }
+
+    private static void summarizeLogAnalysis(LogParser parser) {
+        Map<String, List<String>> logsByLevel = parser.getLogsByLevel();
+        
+        log.info("\n=== 로그 분석 요약 ===");
+        log.info("총 로그 수: {}", 
+            logsByLevel.values().stream().mapToInt(List::size).sum());
+        
+        logsByLevel.forEach((level, logs) -> 
+            log.info("{} 레벨 로그 수: {}", level, logs.size()));
+        
+        // 에러 발생 빈도가 높은 시간대 분석
+        List<String> errorLogs = logsByLevel.getOrDefault("ERROR", new ArrayList<>());
+        if (!errorLogs.isEmpty()) {
+            log.info("에러 로그 수: {}", errorLogs.size());
+            log.warn("주의: 에러 로그가 발견되었습니다. 상세 분석이 필요할 수 있습니다.");
         }
     }
 }

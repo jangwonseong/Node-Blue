@@ -21,6 +21,7 @@ import java.util.stream.Collectors;
 
 import org.reflections.Reflections;
 
+import com.samsa.FlowLoader.FlowLoadException;
 import com.samsa.annotation.NodeType;
 
 @Slf4j
@@ -40,7 +41,7 @@ public class FlowLoaderReflection {
             return createFlow(root);
         } catch (Exception e) {
             log.error("Flow 로딩 중 오류 발생: {}", e.getMessage(), e);
-            throw new FlowLoadException("Flow를 로드할 수 없습니다", e);
+            throw new UnsupportedOperationException("FlowLoader cannot be instantiated");
         }
     }
 
@@ -75,7 +76,7 @@ public class FlowLoaderReflection {
     
             // Add validation before conversion
             if (!Node.class.isAssignableFrom(nodeClass)) {
-                throw new FlowLoadException("Invalid node class: " + nodeClass.getName());
+                throw new UnsupportedOperationException("FlowLoader cannot be instantiated");
             }
     
             return (Node) mapper.convertValue(properties, nodeClass);

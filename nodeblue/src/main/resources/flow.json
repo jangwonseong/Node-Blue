@@ -5,7 +5,7 @@
         "type": "MqttInNode",
         "properties": {
           "broker": "tcp://192.168.70.203:1883",
-          "clientId": "odngodng",
+          "clientId": "dfahjksdhklasdjf",
           "topics": ["data/#"]
         }
       },
