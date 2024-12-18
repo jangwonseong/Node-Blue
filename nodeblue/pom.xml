@@ -65,7 +65,7 @@
         <dependency>
             <groupId>com.influxdb</groupId>
             <artifactId>influxdb-client-java</artifactId>
-            <version>6.12.0</version> 
+            <version>6.12.0</version>
         </dependency>
         <!-- Lombok -->
         <dependency>
@@ -115,6 +115,13 @@
             <groupId>com.mysql</groupId>
             <artifactId>mysql-connector-j</artifactId>
             <version>9.1.0</version>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/hikari-cp/hikari-cp -->
+        <dependency>
+            <groupId>com.zaxxer</groupId>
+            <artifactId>HikariCP</artifactId>
+            <version>5.0.1</version>
+            <!-- 최신 버전 확인 후 업데이트 -->
         </dependency>
     </dependencies>
 </project>
