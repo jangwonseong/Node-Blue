@@ -39,12 +39,12 @@ public class ModbusFlowMain {
         Flow flow = new Flow();
 
         // 1. 노드 생성
-        ModbusNode modbusNode = new ModbusNode("192.168.70.213", 502, 1, 0, 1); // Modbus TCP 서버 주소와 포트
+        ModbusNode modbusNode = new ModbusNode("192.168.70.213", 502, 1, 0, 1); // Modbus TCP 서버 주소와
+                                                                                // 포트
         DelayNode delayNode = new DelayNode(10000); // 1초 지연
         DebugNode debugNode = new DebugNode();
 
         debugNode.setLogLevel("DEBUG"); // 디버그 레벨 설정
-        debugNode.setIncludeMetadata(true); // 메타데이터 포함
 
         // 3. 파이프 생성
         Pipe delayToDebug = new Pipe();
