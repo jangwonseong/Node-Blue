@@ -35,16 +35,19 @@ public class MqttToInfluxFlow {
 
                 String topic = payload.split(",", 2)[0];
                 String jsonPart = payload.split(",", 2)[1].trim();
-
+                
                 if (topic.contains("lora") || topic.contains("power_meter")) {
                     return;
                 }
 
                 // topic 파싱
                 String[] topicParts = topic.split("/");
-                String deviceName = topicParts[10];
-                String measureType = topicParts[topicParts.length - 1];
 
+
+                String spot = topicParts[10];
+                String measureType = topicParts[topicParts.length - 1];
+                String place = topicParts[6]; 
+                
                 // JSON 파싱
                 String timeStr = jsonPart.split("\\{")[1].split(",")[0].split(":")[1];
                 String valueStr = jsonPart.split("value\":")[1].split("}")[0];
@@ -55,14 +58,15 @@ public class MqttToInfluxFlow {
                 Map<String, Object> fields = new HashMap<>();
 
                 // sensor 데이터 구성
-                tags.put("deviceName", deviceName);
+                tags.put("place", place);   
+                tags.put("spot", spot);
                 fields.put(measureType, value); // temperature 등을 필드명으로 사용
 
                 newPayload.put("measurement", "sensor");
                 newPayload.put("tags", tags);
                 newPayload.put("fields", fields);
                 newPayload.put("time", Long.parseLong(timeStr));
-
+                
                 message.setPayload(newPayload);
 
             } catch (Exception e) {

@@ -48,17 +48,6 @@ public class MqttInNode extends OutNode {
         this.qos = new int[topics.length];
     }
     
-    public MqttInNode(String broker, String clientId) {
-        super();
-        if (Objects.isNull(broker) || Objects.isNull(clientId)) {
-            throw new NullPointerException("브로커와 클라이언트 ID는 null일 수 없습니다.");
-        }
-        this.topics = new String[0];
-        this.qos = new int[0];
-        this.broker = broker;
-        this.clientId = clientId;
-    }
-    
 
     @Override
     protected Message createMessage() {

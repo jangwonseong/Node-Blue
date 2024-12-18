@@ -36,7 +36,7 @@ public class ModbusToInfluxFlow {
 
                 String topic = payload.split(",", 2)[0];
                 String jsonPart = payload.split(",", 2)[1].trim();
-
+                
                 if (topic.contains("lora") || topic.contains("power_meter")) {
                     return;
                 }
