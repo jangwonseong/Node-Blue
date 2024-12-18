@@ -87,12 +87,23 @@ public class FlowLoader {
 
     private static Map<String, Node> createNodes(JsonNode nodesConfig, Flow flow) {
         Map<String, Node> nodeMap = new HashMap<>();
+        Map<String, Integer> nodeTypeCounter = new HashMap<>();
+        
         for (JsonNode nodeConfig : nodesConfig) {
+            String type = nodeConfig.get("type").asText();
+            String id = generateNodeId(type, nodeTypeCounter);
+            
             Node node = createNodeWithValidation(nodeConfig);
-            nodeMap.put(nodeConfig.get("id").asText(), node);
+            nodeMap.put(id, node);
             flow.addNode(node);
         }
         return nodeMap;
+    }
+
+    private static String generateNodeId(String type, Map<String, Integer> counter) {
+        int count = counter.getOrDefault(type, 0) + 1;
+        counter.put(type, count);
+        return String.format("%s_%d", type, count);
     }
 
     private static Node createNodeWithValidation(JsonNode nodeConfig) {
