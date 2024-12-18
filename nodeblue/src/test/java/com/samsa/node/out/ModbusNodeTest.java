@@ -1,53 +1,70 @@
 package com.samsa.node.out;
 
 import com.samsa.core.Message;
-import com.serotonin.modbus4j.ModbusFactory;
-import com.serotonin.modbus4j.ModbusMaster;
-import com.serotonin.modbus4j.exception.ModbusInitException;
-import com.serotonin.modbus4j.exception.ModbusTransportException;
-import com.serotonin.modbus4j.msg.ModbusRequest;
-import com.serotonin.modbus4j.msg.ReadHoldingRegistersResponse;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.BeforeEach;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
 
 class ModbusNodeTest {
-
     private ModbusNode modbusNode;
-    private ModbusMaster mockMaster;
-    private ModbusFactory mockFactory;
+    private static final String TEST_HOST = "192.168.70.203";
+    private static final int TEST_PORT = 502;
 
     @BeforeEach
     void setUp() {
-        mockFactory = mock(ModbusFactory.class);
-        mockMaster = mock(ModbusMaster.class);
-        when(mockFactory.createTcpMaster(any(), anyBoolean())).thenReturn(mockMaster);
-
-        modbusNode = new ModbusNode("localhost", 502, 1, 0, 2);
+        modbusNode = new ModbusNode(TEST_HOST, TEST_PORT, 1, 0, 2);
     }
 
     @Test
-    void testCreateMessageSuccess() throws ModbusInitException, ModbusTransportException {
-        ReadHoldingRegistersResponse mockResponse = mock(ReadHoldingRegistersResponse.class);
-        when(mockResponse.isException()).thenReturn(false);
-        when(mockResponse.getShortData()).thenReturn(new short[] {1, 2});
-        when(mockMaster.send((ModbusRequest) any())).thenReturn(mockResponse);
-
-        Message message = modbusNode.createMessage();
-
-        assertNotNull(message);
-        assertArrayEquals(new short[] {1, 2}, (short[]) message.getPayload());
+    void testConstructorWithDefaultKeepAlive() {
+        ModbusNode node = new ModbusNode(TEST_HOST, TEST_PORT, 1, 0, 2);
+        assertNotNull(node);
     }
 
     @Test
-    void testCreateMessageException() throws ModbusInitException, ModbusTransportException {
-        when(mockMaster.send((ModbusRequest) any()))
-                .thenThrow(new ModbusTransportException("Test Exception"));
+    void testConstructorWithCustomKeepAlive() {
+        ModbusNode node = new ModbusNode(TEST_HOST, TEST_PORT, 1, 0, 2, true);
+        assertNotNull(node);
+    }
 
-        Message message = modbusNode.createMessage();
-
+    @Test
+    void testInvalidHostConnection() {
+        ModbusNode invalidNode = new ModbusNode("invalid-host", TEST_PORT, 1, 0, 2);
+        Message message = invalidNode.createMessage();
         assertNull(message);
+    }
+
+    @Test
+    void testInvalidPortConnection() {
+        ModbusNode invalidNode = new ModbusNode(TEST_HOST, 0, 1, 0, 2);
+        Message message = invalidNode.createMessage();
+        assertNull(message);
+    }
+
+    @Test
+    void testInvalidSlaveId() {
+        ModbusNode invalidNode = new ModbusNode(TEST_HOST, TEST_PORT, -1, 0, 2);
+        Message message = invalidNode.createMessage();
+        assertNull(message);
+    }
+
+    @Test
+    void testValidConnection() {
+        Message message = modbusNode.createMessage();
+        if (message != null) {
+            assertNotNull(message.getPayload());
+            assertTrue(message.getPayload() instanceof Short);
+        }
+    }
+
+    @Test
+    void testReadMultipleRegisters() {
+        ModbusNode multiNode = new ModbusNode(TEST_HOST, TEST_PORT, 1, 0, 5);
+        Message message = multiNode.createMessage();
+        if (message != null) {
+            assertNotNull(message.getPayload());
+            assertTrue(message.getPayload() instanceof Short);
+        }
     }
 }

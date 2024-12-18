@@ -7,16 +7,22 @@
         </encoder>
     </appender>
 
-    <!-- FileAppender: 로그를 파일에 저장 -->
-    <appender name="FILE" class="ch.qos.logback.core.FileAppender">
-        <file>log/log.log</file>
+    <!-- RollingFileAppender: 용량 제한이 있는 파일 로깅 -->
+    <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>./log/log.log</file>
         <append>true</append>
         <encoder>
             <pattern>%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n</pattern>
         </encoder>
+        
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <fileNamePattern>./log/archived/log.%d{yyyy-MM-dd}.%i.log.gz</fileNamePattern>
+            <maxFileSize>10MB</maxFileSize>
+            <maxHistory>30</maxHistory>
+            <totalSizeCap>1GB</totalSizeCap>
+        </rollingPolicy>
     </appender>
 
-    <!-- Root Logger: 기본 로그 레벨과 Appender 설정 -->
     <root level="debug">
         <appender-ref ref="CONSOLE" />
         <appender-ref ref="FILE" />
