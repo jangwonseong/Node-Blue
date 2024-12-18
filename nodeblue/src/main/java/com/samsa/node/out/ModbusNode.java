@@ -1,8 +1,5 @@
 package com.samsa.node.out;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import com.samsa.core.Message;
 import com.samsa.core.node.OutNode;
 import com.serotonin.modbus4j.ModbusFactory;
@@ -59,10 +56,10 @@ public class ModbusNode extends OutNode {
     /**
      * ModbusNode 생성자입니다.
      *
-     * @param host           Modbus 장치의 호스트 주소
-     * @param port           Modbus 장치의 포트 번호
-     * @param slaveId        Modbus 슬레이브 ID
-     * @param startOffset    읽기 시작할 레지스터 오프셋
+     * @param host Modbus 장치의 호스트 주소
+     * @param port Modbus 장치의 포트 번호
+     * @param slaveId Modbus 슬레이브 ID
+     * @param startOffset 읽기 시작할 레지스터 오프셋
      * @param numOfRegisters 읽을 레지스터 수
      */
     public ModbusNode(String host, int port, int slaveId, int startOffset, int numOfRegisters) {
@@ -72,12 +69,12 @@ public class ModbusNode extends OutNode {
     /**
      * ModbusNode 생성자입니다.
      *
-     * @param host           Modbus 장치의 호스트 주소
-     * @param port           Modbus 장치의 포트 번호
-     * @param slaveId        Modbus 슬레이브 ID
-     * @param startOffset    읽기 시작할 레지스터 오프셋
+     * @param host Modbus 장치의 호스트 주소
+     * @param port Modbus 장치의 포트 번호
+     * @param slaveId Modbus 슬레이브 ID
+     * @param startOffset 읽기 시작할 레지스터 오프셋
      * @param numOfRegisters 읽을 레지스터 수
-     * @param keepAlive      Modbus 연결의 keep-alive 설정
+     * @param keepAlive Modbus 연결의 keep-alive 설정
      */
     public ModbusNode(String host, int port, int slaveId, int startOffset, int numOfRegisters,
             boolean keepAlive) {
@@ -113,11 +110,12 @@ public class ModbusNode extends OutNode {
 
         try {
             // Modbus 요청 생성
-            ReadHoldingRegistersRequest request = new ReadHoldingRegistersRequest(slaveId, startOffset, numOfRegisters);
+            ReadHoldingRegistersRequest request =
+                    new ReadHoldingRegistersRequest(slaveId, startOffset, numOfRegisters);
 
             // Modbus 응답 처리
-            ReadHoldingRegistersResponse response = (ReadHoldingRegistersResponse) master.send(request);
-
+            ReadHoldingRegistersResponse response =
+                    (ReadHoldingRegistersResponse) master.send(request);
 
             if (response == null || response.isException()) {
                 log.error("Modbus 응답에 오류가 있습니다. 예외 코드: {}", response.getExceptionCode());
@@ -125,10 +123,7 @@ public class ModbusNode extends OutNode {
             }
 
             log.info("Modbus에서 {}개의 레지스터를 성공적으로 읽어왔습니다.", numOfRegisters);
-            
-            Map<String, Object> metadata = new HashMap<>();
-            metadata.put("slaveId", slaveId);
-            
+
             // short[]로 직접 전달
             return new Message(response.getShortData());
         } catch (ModbusTransportException e) {
