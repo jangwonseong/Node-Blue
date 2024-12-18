@@ -16,6 +16,12 @@ import lombok.extern.slf4j.Slf4j;
 import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+import org.reflections.Reflections;
+
+import com.samsa.annotation.NodeType;
 
 @Slf4j
 public class FlowLoaderReflection {
@@ -92,15 +98,22 @@ public class FlowLoaderReflection {
     }
 
     private static Map<String, String> loadPackageMapping() {
-        // Consider loading from configuration file
-        return Map.of(
-            "MqttInNode", "com.samsa.node.out",
-            "InNode", "com.samsa.node.in",
-            "OutNode", "com.samsa.node.out",
-            "DelayNode", "com.samsa.node.inout",
-            "DebugNode", "com.samsa.node.in",
-            "FunctionNode", "com.samsa.node.inout"
-        );
+        try {
+            // 클래스패스에서 @NodeType 어노테이션이 있는 클래스들을 스캔
+            Reflections reflections = new Reflections("com.samsa.node");
+            Set<Class<?>> nodeClasses = reflections.getTypesAnnotatedWith(NodeType.class);
+            
+            return nodeClasses.stream()
+                .filter(cls -> cls.isAnnotationPresent(NodeType.class))
+                .collect(Collectors.toMap(
+                    cls -> cls.getAnnotation(NodeType.class).value(),
+                    Class::getPackageName,
+                    (existing, replacement) -> existing // 중복 시 첫 번째 값 유지
+                ));
+        } catch (Exception e) {
+            log.error("노드 패키지 매핑 로드 중 오류 발생", e);
+            return new HashMap<>();
+        }
     }
     
 

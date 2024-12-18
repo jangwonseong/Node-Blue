@@ -10,7 +10,7 @@ public class FlowTest {
     public static void main(String[] args) {
         try {
             FlowPool flowPool = new FlowPool();
-            Flow flow = FlowLoader.loadFlowFromJson(
+            Flow flow = FlowLoaderReflection.loadFlowFromJson(
                     "/home/nhnacademy/Desktop/Samsa/Node-Blue/nodeblue/src/main/resources/flow.json"
             );
 
