@@ -10,8 +10,6 @@ import org.eclipse.paho.client.mqttv3.MqttClient;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.samsa.ModbusToMqttFlow;
-import com.samsa.core.Message;
 import com.samsa.core.node.InOutNode;
 import com.serotonin.modbus4j.ModbusFactory;
 import com.serotonin.modbus4j.ModbusMaster;
