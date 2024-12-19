@@ -21,7 +21,6 @@ public class FlowPool implements Runnable {
 
     /** 실행할 Flow 객체들을 저장하는 리스트 */
     private final List<Flow> flows = new ArrayList<>();
-    private List<Flow> flows = new ArrayList<>();
     private List<Thread> flowThreads = new ArrayList<>();
     private volatile boolean running = true;
 
