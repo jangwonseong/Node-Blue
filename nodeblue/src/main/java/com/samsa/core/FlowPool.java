@@ -14,24 +14,35 @@ import java.util.List;
  * @version 1.0
  */
 public class FlowPool implements Runnable {
-    /** 실행할 Flow들의 목록 */
     private List<Flow> flows = new ArrayList<>();
+    private List<Thread> flowThreads = new ArrayList<>();
+    private volatile boolean running = true;
 
-    /**
-     * FlowPool에 새로운 Flow를 추가합니다.
-     *
-     * @param flow 추가할 Flow
-     */
     public void addFlow(Flow flow) {
         flows.add(flow);
     }
 
-    /**
-     * FlowPool에 포함된 모든 Flow를 병렬로 실행합니다.
-     * 각 Flow는 독립적인 스레드에서 실행됩니다.
-     */
     @Override
     public void run() {
-        flows.forEach(flow -> new Thread(flow).start());
+        flowThreads.clear();
+        running = true;
+        
+        flows.forEach(flow -> {
+            Thread thread = new Thread(flow);
+            flowThreads.add(thread);
+            thread.start();
+        });
+    }
+
+    /**
+     * FlowPool에 포함된 모든 Flow의 실행을 중지합니다.
+     * 각 Flow의 스레드를 인터럽트하고 리소스를 정리합니다.
+     */
+    public void stop() {
+        running = false;
+        flowThreads.forEach(Thread::interrupt);
+        flowThreads.clear();
+        flows.clear();
     }
 }
+                                                      
