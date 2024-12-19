@@ -1,5 +1,10 @@
 package com.samsa.node.out;
 
+import java.util.HashMap;
+import java.util.Map;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.samsa.annotation.NodeType;
 import com.samsa.core.Message;
 import com.samsa.core.node.OutNode;
 import com.serotonin.modbus4j.ModbusFactory;
@@ -15,43 +20,22 @@ import lombok.extern.slf4j.Slf4j;
 /**
  * ModbusNode 클래스는 Modbus 장치로부터 데이터를 읽어와 메시지를 생성하는 노드입니다.
  */
+@NodeType("ModbusNode")
 @Slf4j
 public class ModbusNode extends OutNode {
 
-    /**
-     * 기본 keep-alive 설정 값입니다.
-     */
     private static final boolean DEFAULT_KEEPALIVE = false;
 
-    /**
-     * Modbus 장치의 호스트 주소입니다.
-     */
     private final String host;
-
-    /**
-     * Modbus 장치의 포트 번호입니다.
-     */
     private final int port;
-
-    /**
-     * Modbus 연결의 keep-alive 설정입니다.
-     */
     private final boolean keepAlive;
-
-    /**
-     * Modbus 슬레이브 ID입니다.
-     */
     private final int slaveId;
-
-    /**
-     * Modbus 레지스터 시작 오프셋입니다.
-     */
     private final int startOffset;
-
-    /**
-     * 읽을 Modbus 레지스터 수입니다.
-     */
+    private final int offsetInterval;
+    private final int maxOffset;
     private final int numOfRegisters;
+
+    private int currentOffset;
 
     /**
      * ModbusNode 생성자입니다.
@@ -62,8 +46,14 @@ public class ModbusNode extends OutNode {
      * @param startOffset 읽기 시작할 레지스터 오프셋
      * @param numOfRegisters 읽을 레지스터 수
      */
-    public ModbusNode(String host, int port, int slaveId, int startOffset, int numOfRegisters) {
-        this(host, port, slaveId, startOffset, numOfRegisters, DEFAULT_KEEPALIVE);
+    @JsonCreator
+    public ModbusNode(@JsonProperty("host") String host, @JsonProperty("port") int port,
+            @JsonProperty("slaveId") int slaveId, @JsonProperty("startOffset") int startOffset,
+            @JsonProperty("offsetInterval") int offsetInterval,
+            @JsonProperty("maxOffset") int maxOffset,
+            @JsonProperty("numOfRegisters") int numOfRegisters) {
+        this(host, port, slaveId, startOffset, offsetInterval, maxOffset, numOfRegisters,
+                DEFAULT_KEEPALIVE);
     }
 
     /**
@@ -73,17 +63,22 @@ public class ModbusNode extends OutNode {
      * @param port Modbus 장치의 포트 번호
      * @param slaveId Modbus 슬레이브 ID
      * @param startOffset 읽기 시작할 레지스터 오프셋
+     * @param offsetInterval 시작 오프셋부터 마지막 오프셋까지 간격
+     * @param maxOffset 마지막 레지스터 오프셋
      * @param numOfRegisters 읽을 레지스터 수
      * @param keepAlive Modbus 연결의 keep-alive 설정
      */
-    public ModbusNode(String host, int port, int slaveId, int startOffset, int numOfRegisters,
-            boolean keepAlive) {
+    public ModbusNode(String host, int port, int slaveId, int startOffset, int offsetInterval,
+            int maxOffset, int numOfRegisters, boolean keepAlive) {
         this.host = host;
         this.port = port;
         this.keepAlive = keepAlive;
         this.slaveId = slaveId;
         this.startOffset = startOffset;
+        this.offsetInterval = offsetInterval;
+        this.maxOffset = maxOffset;
         this.numOfRegisters = numOfRegisters;
+        this.currentOffset = startOffset;
     }
 
     /**
@@ -104,34 +99,63 @@ public class ModbusNode extends OutNode {
             master.init();
             log.info("Modbus 마스터가 성공적으로 초기화되었습니다: {}:{}, keepAlive={}", host, port, keepAlive);
         } catch (ModbusInitException e) {
-            log.error("Modbus 마스터 초기화 중 에러 발생: {}", e.getMessage(), e);
+            log.error("Modbus 마스터 초기화 중 오류 발생: {}", e.getMessage(), e);
             return null;
         }
 
+        // 데이터 읽기 및 메시지 생성
         try {
-            // Modbus 요청 생성
-            ReadHoldingRegistersRequest request =
-                    new ReadHoldingRegistersRequest(slaveId, startOffset, numOfRegisters);
-
-            // Modbus 응답 처리
+            ReadHoldingRegistersRequest request = new ReadHoldingRegistersRequest(slaveId,
+                    currentOffset * offsetInterval, numOfRegisters);
             ReadHoldingRegistersResponse response =
                     (ReadHoldingRegistersResponse) master.send(request);
 
             if (response == null || response.isException()) {
-                log.error("Modbus 응답에 오류가 있습니다. 예외 코드: {}", response.getExceptionCode());
+                log.error("Modbus 응답에 오류가 있습니다. 예외 코드: {}",
+                        response != null ? response.getExceptionCode() : "null");
                 return null;
             }
 
             log.info("Modbus에서 {}개의 레지스터를 성공적으로 읽어왔습니다.", numOfRegisters);
 
-            // short[]로 직접 전달
-            return new Message(response.getShortData());
+            // 응답 데이터를 Message로 변환하여 반환
+            Map<String, Object> payload = new HashMap<>();
+            payload.put("offset", currentOffset);
+            payload.put("data", response.getShortData());
+            return new Message(payload);
         } catch (ModbusTransportException e) {
             log.error("Modbus 전송 오류 발생: {}", e.getMessage(), e);
             return null;
         } finally {
+            updateOffset();
+            cleanUp(master);
+        }
+    }
+
+    /**
+     * 오프셋을 업데이트합니다.
+     */
+    private void updateOffset() {
+        log.info("currentOffset : {}, offsetInterval : {}, maxOffset : {}", currentOffset,
+                offsetInterval, maxOffset);
+        if (currentOffset * offsetInterval >= maxOffset) {
+            currentOffset = startOffset; // 오프셋 리셋
+        } else {
+            currentOffset++; // 오프셋 증가
+        }
+    }
+
+    /**
+     * Modbus 마스터 객체를 종료합니다.
+     *
+     * @param master ModbusMaster 객체
+     */
+    private void cleanUp(ModbusMaster master) {
+        try {
             master.destroy();
             log.info("Modbus 마스터가 종료되었습니다.");
+        } catch (Exception e) {
+            log.error("Modbus 마스터 종료 중 오류 발생: {}", e.getMessage(), e);
         }
     }
 }
