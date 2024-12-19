@@ -2,6 +2,9 @@ package com.samsa.node.in;
 
 import java.sql.*;
 import java.util.Map;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.samsa.annotation.NodeType;
 import com.samsa.core.Message;
 import com.samsa.core.node.InNode;
 import com.zaxxer.hikari.HikariConfig;
@@ -11,6 +14,7 @@ import lombok.extern.slf4j.Slf4j;
 /**
  * {@code MySqlNode} 클래스는 MySQL 데이터베이스와 상호작용하여 메시지를 처리하는 노드입니다.
  */
+@NodeType("MysqlNode")
 @Slf4j
 public class MySqlNode extends InNode {
 
@@ -26,7 +30,10 @@ public class MySqlNode extends InNode {
      * @param userPw 데이터베이스 사용자 비밀번호
      * @param query 실행할 SQL 쿼리
      */
-    public MySqlNode(String driver, String url, String userId, String userPw, String query) {
+    @JsonCreator
+    public MySqlNode(@JsonProperty("driver") String driver, @JsonProperty("url") String url,
+            @JsonProperty("userId") String userId, @JsonProperty("password") String userPw,
+            @JsonProperty("sql") String query) {
         super();
         this.query = query;
 
@@ -87,11 +94,11 @@ public class MySqlNode extends InNode {
      */
     private void doInsert(Map<String, Object> columnMap, Connection connection)
             throws SQLException {
-        // 동적 SQL 쿼리 생성
         StringBuilder sql = new StringBuilder(query);
         StringBuilder placeholders = new StringBuilder();
-        int index = 1;
 
+        // 동적 SQL 쿼리 생성
+        int index = 1;
         for (String column : columnMap.keySet()) {
             sql.append(column);
             placeholders.append("?");
@@ -106,19 +113,11 @@ public class MySqlNode extends InNode {
         sql.append(") VALUES (").append(placeholders).append(")");
 
         try (PreparedStatement preparedStatement = connection.prepareStatement(sql.toString())) {
-            // PreparedStatement에 값을 바인딩
             index = 1;
+
+            // PreparedStatement에 값을 바인딩
             for (Object value : columnMap.values()) {
-                if (value instanceof String) {
-                    preparedStatement.setString(index, (String) value);
-                } else if (value instanceof Double) {
-                    preparedStatement.setDouble(index, (Double) value);
-                } else if (value instanceof Integer) {
-                    preparedStatement.setInt(index, (Integer) value);
-                } else {
-                    preparedStatement.setObject(index, value);
-                }
-                index++;
+                setPreparedStatementValue(preparedStatement, index++, value);
             }
 
             // INSERT 쿼리 실행
@@ -127,6 +126,27 @@ public class MySqlNode extends InNode {
         } catch (SQLException e) {
             log.error("INSERT 쿼리 실행 중 오류 발생: {}", e.getMessage(), e);
             throw e;
+        }
+    }
+
+    /**
+     * PreparedStatement에 값을 바인딩합니다.
+     *
+     * @param preparedStatement PreparedStatement 객체
+     * @param index 값이 바인딩될 인덱스
+     * @param value 바인딩할 값
+     * @throws SQLException SQL 실행 중 오류가 발생한 경우
+     */
+    private void setPreparedStatementValue(PreparedStatement preparedStatement, int index,
+            Object value) throws SQLException {
+        if (value instanceof String) {
+            preparedStatement.setString(index, (String) value);
+        } else if (value instanceof Double) {
+            preparedStatement.setDouble(index, (Double) value);
+        } else if (value instanceof Integer) {
+            preparedStatement.setInt(index, (Integer) value);
+        } else {
+            preparedStatement.setObject(index, value);
         }
     }
 

@@ -3,6 +3,7 @@ package com.samsa.node.in;
 import java.util.UUID;
 import com.samsa.core.Message;
 import com.samsa.core.node.InNode;
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.samsa.annotation.NodeType;
 
 import lombok.extern.slf4j.Slf4j;
@@ -10,9 +11,8 @@ import lombok.extern.slf4j.Slf4j;
 /**
  * 디버깅 목적으로 수신된 메시지를 로깅하는 입력 노드입니다. 설정 가능한 로그 레벨과 메타데이터 포함 옵션을 제공하여 유연한 디버깅을 지원합니다.
  * 
- * 이 노드는 다음과 같은 기능을 제공합니다: 다양한 로그 레벨 지원 (DEBUG, INFO, WARN, ERROR) 메타데이터 포함/제외 옵션 null 메시지 및 페이로드 처리
- * 예외 상황에 대한 오류 로깅
- * 
+ * 이 노드는 다음과 같은 기능을 제공합니다: - 다양한 로그 레벨 지원 (DEBUG, INFO, WARN, ERROR) - 메타데이터 포함/제외 옵션 - null 메시지 및
+ * 페이로드 처리 - 예외 상황에 대한 오류 로깅
  * 
  * @author samsa
  * @version 1.0
@@ -25,6 +25,7 @@ public class DebugNode extends InNode {
     /**
      * 기본 생성자입니다. 랜덤 UUID를 사용하여 노드를 생성합니다. 기본 로그 레벨은 "INFO"로 설정됩니다.
      */
+    @JsonCreator
     public DebugNode() {
         super();
     }
@@ -47,7 +48,7 @@ public class DebugNode extends InNode {
      */
     public void setLogLevel(String level) {
         if (!isValidLogLevel(level)) {
-            throw new IllegalArgumentException("Invalid log level: " + level);
+            throw new IllegalArgumentException("유효하지 않은 로그 레벨: " + level);
         }
         this.logLevel = level.toUpperCase();
     }
@@ -76,13 +77,13 @@ public class DebugNode extends InNode {
     public void onMessage(Message message) {
         try {
             if (message == null) {
-                log.warn("Node[{}] - Received null message", getId());
+                log.warn("노드[{}] - null 메시지가 수신되었습니다", getId());
                 return;
             }
 
             Object payload = message.getPayload();
             if (payload == null) {
-                log.warn("Node[{}] - Message contains null payload", getId());
+                log.warn("노드[{}] - 메시지에 null 페이로드가 포함되어 있습니다", getId());
                 return;
             }
 
@@ -90,11 +91,10 @@ public class DebugNode extends InNode {
             logMessage(logMessage);
 
         } catch (Exception e) {
-            log.error("Node[{}] - Error processing message", getId(), e);
-            throw new IllegalStateException("Failed to process message", e);
+            log.error("노드[{}] - 메시지 처리 중 오류 발생", getId(), e);
+            throw new IllegalStateException("메시지 처리에 실패했습니다", e);
         }
     }
-
 
     /**
      * 메시지를 로그 형식으로 포맷팅합니다.
@@ -104,8 +104,8 @@ public class DebugNode extends InNode {
      */
     private String formatLogMessage(Message message) {
         StringBuilder sb = new StringBuilder();
-        sb.append("Node[").append(getId()).append("] - ");
-        sb.append("Payload: ").append(message.getPayload());
+        sb.append("노드[").append(getId()).append("] - ");
+        sb.append("페이로드: ").append(message.getPayload());
         return sb.toString();
     }
 

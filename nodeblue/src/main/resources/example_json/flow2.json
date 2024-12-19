@@ -1,0 +1,45 @@
+{
+  "nodes": [
+    {
+      "id": "InjectNode_1",
+      "type": "InjectNode",
+      "properties": {
+        "payload": "하위"
+      }
+    },
+    {
+      "id": "DelayNode_1",
+      "type": "DelayNode",
+      "properties": {
+        "delay": 1000
+      }
+    },
+    {
+      "id": "FunctionNode_1",
+      "type": "FunctionNode",
+      "properties": {
+        "className": "MqttToDebugCode",
+        "code": "message.setPayload(\"백동호 입니다.\");"
+      }
+    },
+    {
+      "id": "DebugNode_1",
+      "type": "DebugNode",
+      "properties": {}
+    }
+  ],
+  "connections": [
+    {
+      "from": "InjectNode_1",
+      "to": "DelayNode_1"
+    },
+    {
+      "from": "DelayNode_1",
+      "to": "FunctionNode_1"
+    },
+    {
+      "from": "FunctionNode_1",
+      "to": "DebugNode_1"
+    }
+  ]
+}

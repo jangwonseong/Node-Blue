@@ -140,7 +140,7 @@
             <groupId>org.reflections</groupId>
             <artifactId>reflections</artifactId>
             <version>0.10.2</version>
-      </dependency>
+        </dependency>
         <!-- https://mvnrepository.com/artifact/hikari-cp/hikari-cp -->
         <dependency>
             <groupId>com.zaxxer</groupId>

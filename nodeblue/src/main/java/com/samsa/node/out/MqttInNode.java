@@ -23,49 +23,39 @@ import lombok.extern.slf4j.Slf4j;
 @NodeType("MqttInNode")
 @Slf4j
 public class MqttInNode extends OutNode {
+
     private MqttClient mqttClient;
     private MqttConnectOptions connectOptions;
     private String broker;
     private String clientId;
     private String[] topics;
     private int[] qos;
-    
+
     /**
      * Jackson 역직렬화를 위한 생성자
      */
     @JsonCreator
-    public MqttInNode(
-            @JsonProperty("broker") String broker,
-            @JsonProperty("clientId") String clientId,
-            @JsonProperty("topics") String[] topics) {
+    public MqttInNode(@JsonProperty("broker") String broker,
+            @JsonProperty("clientId") String clientId, @JsonProperty("topics") String[] topics) {
         super();
         if (Objects.isNull(broker) || Objects.isNull(clientId)) {
-            throw new NullPointerException("브로커와 클라이언트 ID는 null일 수 없습니다.");
+            throw new IllegalArgumentException("브로커와 클라이언트 ID는 null일 수 없습니다.");
         }
         this.broker = broker;
         this.clientId = clientId;
         this.topics = topics;
         this.qos = new int[topics.length];
-    }
-    
-    public MqttInNode(String broker, String clientId) {
-        super();
-        if (Objects.isNull(broker) || Objects.isNull(clientId)) {
-            throw new NullPointerException("브로커와 클라이언트 ID는 null일 수 없습니다.");
+        // 기본 QoS 레벨을 설정 (0)
+        for (int i = 0; i < topics.length; i++) {
+            this.qos[i] = 0;
         }
-        this.topics = new String[0];
-        this.qos = new int[0];
-        this.broker = broker;
-        this.clientId = clientId;
     }
-    
 
     @Override
     protected Message createMessage() {
+        // 이 메서드는 MQTT 메시지를 직접 생성하지 않으므로 null 반환
         return null;
     }
-    
-
 
     /**
      * MQTT 연결이 끊어졌을 때 재연결을 시도하는 메서드입니다.
@@ -79,7 +69,7 @@ public class MqttInNode extends OutNode {
     private void handleConnectionLost(MqttClient client, MqttConnectOptions options,
             Throwable cause, String[] topics, int[] qos) {
         log.trace("연결이 끊어졌습니다: {}", cause.getMessage());
-        
+
         while (!client.isConnected()) {
             try {
                 log.info("재연결 시도 중...");
@@ -90,28 +80,27 @@ public class MqttInNode extends OutNode {
             } catch (MqttException e) {
                 log.error("재연결 실패: {}", e.getMessage());
                 try {
-                    Thread.sleep(5000);
+                    Thread.sleep(5000); // 5초 후 재시도
                 } catch (InterruptedException ie) {
-                    Thread.currentThread().interrupt();
+                    Thread.currentThread().interrupt(); // 인터럽트 처리
                     break;
                 }
             }
         }
     }
 
-
-
     @Override
     public void run() {
         try {
             mqttClient = new MqttClient(broker, clientId);
             connectOptions = new MqttConnectOptions();
-            connectOptions.setAutomaticReconnect(true);
-            connectOptions.setCleanSession(true);
-            connectOptions.setConnectionTimeout(10);
-            
-            mqttClient.connect(connectOptions);
-            
+            connectOptions.setAutomaticReconnect(true); // 자동 재연결 활성화
+            connectOptions.setCleanSession(true); // 클린 세션
+            connectOptions.setConnectionTimeout(10); // 연결 타임아웃 설정 (초)
+
+            mqttClient.connect(connectOptions); // 연결 시도
+
+            // 토픽 구독
             for (String topic : topics) {
                 mqttClient.subscribe(topic);
                 log.info("토픽 '{}'을 구독했습니다.", topic);
@@ -130,12 +119,12 @@ public class MqttInNode extends OutNode {
                     String payload = String.format("{topic: %s, %s}", topic,
                             new String(mqttMessage.getPayload()));
                     Message message = new Message(payload);
-                    emit(message);
+                    emit(message); // 수신된 메시지를 처리
                 }
 
                 @Override
                 public void deliveryComplete(IMqttDeliveryToken token) {
-                    // 발행이 완료되면 호출됩니다.
+                    // 발행 완료 시 호출
                 }
             });
 

@@ -9,8 +9,7 @@ import com.samsa.core.Pipe;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * OutPort 클래스는 노드의 출력 포트를 구현합니다.
- * 여러 파이프로 메시지를 전파하고 관리하는 기능을 제공합니다.
+ * OutPort 클래스는 노드의 출력 포트를 구현합니다. 여러 파이프로 메시지를 전파하고 관리하는 기능을 제공합니다.
  * 
  * <p>
  * 주요 기능:
@@ -44,10 +43,10 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class OutPort {
     /** 포트의 고유 식별자 */
-    private UUID id;
+    private final UUID id;
 
     /** 출력 파이프들의 목록 (스레드 안전) */
-    private List<Pipe> pipes;
+    private final List<Pipe> pipes;
 
     /**
      * 기본 생성자. 새로운 UUID로 포트를 생성합니다.
@@ -62,13 +61,12 @@ public class OutPort {
      * @param id 포트의 고유 식별자
      */
     public OutPort(UUID id) {
-        this.id = id;
-        pipes = new CopyOnWriteArrayList<>();
+        this.id = Objects.requireNonNull(id, "ID는 null일 수 없습니다.");
+        this.pipes = new CopyOnWriteArrayList<>();
     }
 
     /**
-     * 메시지를 모든 연결된 파이프로 전파합니다.
-     * 각 파이프로의 전송은 독립적으로 처리되며, 실패 시 로깅됩니다.
+     * 메시지를 모든 연결된 파이프로 전파합니다. 각 파이프로의 전송은 독립적으로 처리되며, 실패 시 로깅됩니다.
      *
      * @param message 전파할 메시지
      * @throws IllegalArgumentException message가 null인 경우
@@ -76,12 +74,14 @@ public class OutPort {
     public void propagate(Message message) {
         if (Objects.isNull(message)) {
             log.error("전파할 메시지가 null입니다. OutPortId: {}", id);
-            throw new IllegalArgumentException("Message cannot be null");
+            throw new IllegalArgumentException("Message는 null일 수 없습니다.");
         }
 
         for (Pipe pipe : pipes) {
-            if (pipe == null)
+            if (pipe == null) {
+                log.warn("null 파이프가 목록에 존재합니다. 이를 건너뜁니다.");
                 continue;
+            }
             try {
                 pipe.offer(message);
                 log.debug("파이프로 메시지 전송 완료. PipeId: {}, pipe size: {}", pipe.getId(), pipe.size());
@@ -97,7 +97,10 @@ public class OutPort {
      * @return 최소 하나의 파이프가 데이터를 수용할 수 있으면 true, 그렇지 않으면 false
      */
     public boolean canAcceptData() {
-        return pipes.stream().anyMatch(pipe -> Objects.nonNull(pipe) && !pipe.isFull());
+        boolean canAccept =
+                pipes.stream().anyMatch(pipe -> Objects.nonNull(pipe) && !pipe.isFull());
+        log.debug("데이터 수용 가능 여부: {}", canAccept);
+        return canAccept;
     }
 
     /**
@@ -108,9 +111,11 @@ public class OutPort {
      */
     public void addPipe(Pipe pipe) {
         if (Objects.isNull(pipe)) {
-            throw new IllegalArgumentException("Pipe cannot be null");
+            log.error("추가하려는 파이프가 null입니다.");
+            throw new IllegalArgumentException("Pipe는 null일 수 없습니다.");
         }
         pipes.add(pipe);
+        log.info("파이프가 추가되었습니다. PipeId: {}", pipe.getId());
     }
 
     /**
@@ -121,9 +126,14 @@ public class OutPort {
      */
     public void removePipe(Pipe pipe) {
         if (Objects.isNull(pipe)) {
-            throw new IllegalArgumentException("Pipe cannot be null");
+            log.error("제거하려는 파이프가 null입니다.");
+            throw new IllegalArgumentException("Pipe는 null일 수 없습니다.");
         }
-        pipes.remove(pipe);
+        if (pipes.remove(pipe)) {
+            log.info("파이프가 제거되었습니다. PipeId: {}", pipe.getId());
+        } else {
+            log.warn("제거하려는 파이프가 목록에 존재하지 않습니다. PipeId: {}", pipe.getId());
+        }
     }
 
     /**
@@ -141,6 +151,6 @@ public class OutPort {
      * @return 파이프 목록
      */
     public List<Pipe> getPipes() {
-        return pipes;
+        return List.copyOf(pipes);
     }
 }
