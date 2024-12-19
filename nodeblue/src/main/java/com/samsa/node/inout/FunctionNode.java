@@ -171,7 +171,7 @@ public class FunctionNode extends InOutNode {
     private static String writeJavaSourceToFile(String javaCode, String packageName,
             String className) throws IOException {
         String dirPath = packageName.isEmpty() ? ""
-                : "nodeblue/src/main/java/" + packageName.replace('.', '/');
+                : System.getProperty("user.dir") + "src/main/java/" + packageName.replace('.', '/');
         File dir = new File(dirPath);
         if (!dir.exists() && !dir.mkdirs()) {
             throw new IOException("디렉토리 생성 실패: " + dirPath);
