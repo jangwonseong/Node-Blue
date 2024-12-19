@@ -9,8 +9,7 @@ import com.samsa.core.Pipe;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * InPort 클래스는 노드의 입력 포트를 구현합니다.
- * 여러 파이프로부터 메시지를 수신하고 관리하는 기능을 제공합니다.
+ * InPort 클래스는 노드의 입력 포트를 구현합니다. 여러 파이프로부터 메시지를 수신하고 관리하는 기능을 제공합니다.
  * 
  * <p>
  * 주요 기능:
@@ -43,10 +42,10 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class InPort {
     /** 포트의 고유 식별자 */
-    private UUID id;
+    private final UUID id;
 
     /** 입력 파이프들의 목록 */
-    private List<Pipe> pipes;
+    private final List<Pipe> pipes;
 
     /**
      * 기본 생성자. 새로운 UUID로 포트를 생성합니다.
@@ -61,28 +60,28 @@ public class InPort {
      * @param id 포트의 고유 식별자
      */
     public InPort(UUID id) {
-        this.id = id;
-        pipes = new ArrayList<>();
+        this.id = Objects.requireNonNull(id, "ID는 null일 수 없습니다.");
+        this.pipes = new ArrayList<>();
     }
 
     /**
-     * 연결된 파이프들로부터 메시지를 소비합니다.
-     * 파이프들을 순차적으로 확인하여 첫 번째로 발견된 메시지를 반환합니다.
+     * 연결된 파이프들로부터 메시지를 소비합니다. 파이프들을 순차적으로 확인하여 첫 번째로 발견된 메시지를 반환합니다.
      *
-     * @return 수신된 메시지, 또는 가용한 메시지가 없는 경우 null
+     * @return 수신된 메시지, 가용한 메시지가 없는 경우 null
      */
     public Message consume() {
-        log.info("메세지 생김");
         for (Pipe pipe : pipes) {
             if (Objects.isNull(pipe)) {
+                log.warn("null 파이프가 목록에 존재합니다. 이를 건너뜁니다.");
                 continue;
             }
             Message message = pipe.poll();
             if (Objects.nonNull(message)) {
+                log.debug("메시지를 소비했습니다. PipeId: {}, MessageId: {}", pipe.getId(), message.getId());
                 return message;
             }
         }
-
+        log.debug("소비 가능한 메시지가 없습니다.");
         return null;
     }
 
@@ -92,7 +91,10 @@ public class InPort {
      * @return 하나 이상의 파이프에 메시지가 있으면 true, 그렇지 않으면 false
      */
     public boolean hasAvailableData() {
-        return pipes.stream().anyMatch(pipe -> Objects.nonNull(pipe) && !pipe.isEmpty());
+        boolean available =
+                pipes.stream().anyMatch(pipe -> Objects.nonNull(pipe) && !pipe.isEmpty());
+        log.debug("데이터 가용성 상태: {}", available);
+        return available;
     }
 
     /**
@@ -103,9 +105,11 @@ public class InPort {
      */
     public void addPipe(Pipe pipe) {
         if (Objects.isNull(pipe)) {
-            throw new IllegalArgumentException("Pipe cannot be null");
+            log.error("추가하려는 파이프가 null입니다.");
+            throw new IllegalArgumentException("Pipe는 null일 수 없습니다.");
         }
         pipes.add(pipe);
+        log.info("파이프가 추가되었습니다. PipeId: {}", pipe.getId());
     }
 
     /**
@@ -116,9 +120,14 @@ public class InPort {
      */
     public void removePipe(Pipe pipe) {
         if (Objects.isNull(pipe)) {
-            throw new IllegalArgumentException("Pipe cannot be null");
+            log.error("제거하려는 파이프가 null입니다.");
+            throw new IllegalArgumentException("Pipe는 null일 수 없습니다.");
         }
-        pipes.remove(pipe);
+        if (pipes.remove(pipe)) {
+            log.info("파이프가 제거되었습니다. PipeId: {}", pipe.getId());
+        } else {
+            log.warn("제거하려는 파이프가 목록에 존재하지 않습니다. PipeId: {}", pipe.getId());
+        }
     }
 
     /**
@@ -136,6 +145,6 @@ public class InPort {
      * @return 파이프 목록
      */
     public List<Pipe> getPipes() {
-        return pipes;
+        return new ArrayList<>(pipes);
     }
 }
