@@ -1,11 +1,11 @@
 package com.samsa;
 
+import java.nio.file.Paths;
+
 import com.samsa.core.Flow;
 import com.samsa.core.FlowPool;
 
 import lombok.extern.slf4j.Slf4j;
-
-import java.nio.file.Paths;
 
 /**
  * 이 클래스는 JSON 구성 파일에서 흐름을 로드하고 실행하는 예시입니다. 흐름은 nodeblue/src/main/resources/example_json 폴더의 파일에서 상대
@@ -29,19 +29,19 @@ public class FlowTest {
             FlowPool flowPool = new FlowPool();
 
             // nodeblue/src/main/resources/example_json 폴더에서 상대 경로로 JSON 파일을 로드
-            String flow1Path = Paths.get("nodeblue", "src", "main", "resources", "example_json",
-                    "ModbusToMqttFlow.json").toString();
-            // String flow2Path =
-            // Paths.get("nodeblue", "src", "main", "resources", "example_json", "flow2.json")
-            // .toString();
+            String flow1Path = Paths.get("Node-Blue","nodeblue", "src", "main", "resources", "example_json",
+                    "flow.json").toString();
+            String flow2Path =
+            Paths.get("Node-Blue", "nodeblue", "src", "main", "resources", "example_json", "flow2.json")
+            .toString();
 
             // Flow 객체 생성
             Flow flow1 = FlowLoader.loadFlowFromJson(flow1Path);
-            // Flow flow2 = FlowLoader.loadFlowFromJson(flow2Path);
+            Flow flow2 = FlowLoader.loadFlowFromJson(flow2Path);
 
             // 흐름을 FlowPool에 추가합니다.
             flowPool.addFlow(flow1);
-            // flowPool.addFlow(flow2);
+            flowPool.addFlow(flow2);
 
             // 흐름을 실행합니다.
             flowPool.run();
