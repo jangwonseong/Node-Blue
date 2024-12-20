@@ -69,16 +69,5 @@ public class FlowPool implements Runnable {
             thread.start();
         });
     }
-
-    /**
-     * FlowPool에 포함된 모든 Flow의 실행을 중지합니다.
-     * 각 Flow의 스레드를 인터럽트하고 리소스를 정리합니다.
-     */
-    public void stop() {
-        running = false;
-        flowThreads.forEach(Thread::interrupt);
-        flowThreads.clear();
-        flows.clear();
-    }
 }
                                                       
