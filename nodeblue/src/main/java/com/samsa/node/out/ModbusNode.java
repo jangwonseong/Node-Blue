@@ -104,7 +104,11 @@ public class ModbusNode extends OutNode {
         }
 
         // 데이터 읽기 및 메시지 생성
+        // 데이터 읽기 및 메시지 생성
         try {
+            // 요청을 보내기 전에 지연 시간 추가
+            Thread.sleep(5000); // 10초 대기
+
             ReadHoldingRegistersRequest request = new ReadHoldingRegistersRequest(slaveId,
                     currentOffset * offsetInterval, numOfRegisters);
             ReadHoldingRegistersResponse response =
@@ -126,10 +130,15 @@ public class ModbusNode extends OutNode {
         } catch (ModbusTransportException e) {
             log.error("Modbus 전송 오류 발생: {}", e.getMessage(), e);
             return null;
+        } catch (InterruptedException e) {
+            log.error("스레드가 인터럽트되었습니다: {}", e.getMessage(), e);
+            Thread.currentThread().interrupt(); // InterruptedException 처리
+            return null;
         } finally {
             updateOffset();
             cleanUp(master);
         }
+
     }
 
     /**
